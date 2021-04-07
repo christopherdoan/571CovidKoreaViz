@@ -17,8 +17,8 @@
 <body>
 
 <svg></svg>
-<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="//d3js.org/topojson.v3.min.js"></script>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/topojson.v3.min.js"></script>
 <script>
 
 /* JavaScript goes here. */
@@ -49,7 +49,7 @@ var mapLayer = g.append('g')
   .classed('map-layer', true);
 
 
-d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
+d3.json("data/province_name.json", function(error, mapData) {
   if (error) return console.error(error);
 
   var features = mapData.features;
@@ -57,11 +57,27 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
   // Draw each province as a path
   mapLayer.selectAll('path')
       .data(features)
-    .enter().append('path')
+      .enter().append('path')
       .attr('d', path)
       .attr('vector-effect', 'non-scaling-stroke')
       .on('mouseover', mouseover)
       .on('mouseout', mouseout);
+
+  mapLayer.selectAll("text")
+      .data(features)
+      .enter()
+      .append("svg:text")
+      .text(function(d){
+          return d.properties.NAME_1;
+      })
+      .attr("x", function(d){
+          return path.centroid(d)[0];
+      })
+      .attr("y", function(d){
+          return  path.centroid(d)[1];
+      })
+      .attr("text-anchor","middle")
+      .attr('font-size','6pt');
 
 });
 
