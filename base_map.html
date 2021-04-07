@@ -80,7 +80,28 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
       .attr("text-anchor","middle")
       .attr('font-size','6pt');
 
-});
+  d3.csv("data/link.csv", function(error, edges){
+      edges.forEach(function(d){
+        var p1 = projection([d.origin_lon, d.origin_lat]),
+            p2 = projection([d.dest_lon, d.dest_lat]);
+        var volume = d.count;
+        if (!p1[0] == p2[0] || !p1[1] == p2[1]){ }
+        else {
+          svg.append("line")
+		      .attr("x1", p1[0])
+		      .attr("x2", p2[0])
+		      .attr("y1", p1[1])
+		      .attr("y2", p2[1])
+		      .style("stroke", "steelblue")
+          .attr("stroke-width", volume)
+        }
+      })
+
+  }
+
+);
+
+
 
 function mouseover(d){
   // Highlight hovered province
@@ -92,5 +113,7 @@ function mouseout(d){
   mapLayer.selectAll('path')
     .style('fill', "#fff");
 }
+});
+
 
 </script>
