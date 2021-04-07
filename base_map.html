@@ -49,7 +49,7 @@ var mapLayer = g.append('g')
   .classed('map-layer', true);
 
 
-d3.json("data/province_name.json", function(error, mapData) {
+d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
   if (error) return console.error(error);
 
   var features = mapData.features;
@@ -63,12 +63,13 @@ d3.json("data/province_name.json", function(error, mapData) {
       .on('mouseover', mouseover)
       .on('mouseout', mouseout);
 
+  // Attach name to province
   mapLayer.selectAll("text")
       .data(features)
       .enter()
       .append("svg:text")
       .text(function(d){
-          return d.properties.NAME_1;
+          return d.properties.name_eng;
       })
       .attr("x", function(d){
           return path.centroid(d)[0];
