@@ -13,6 +13,26 @@
   stroke: #aaa;
 }
 
+.window-layer{
+  fill : white;
+  stroke: black;
+}
+
+#tooltip {
+  background: rgba(255, 255, 255, 0.92);
+  position:absolute;
+  height:auto;
+  visibility:hidden;
+  z-index:9999;
+  padding:5px;
+  border: 1px solid #ddd;
+  padding: 5px 15px 5px 15px;
+  font-family: arial, sans-serif;
+  -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+}
+
 </style>
 <body>
 
@@ -48,20 +68,27 @@ var g = svg.append('g');
 var mapLayer = g.append('g')
   .classed('map-layer', true);
 
+var windowLayer = g.append('g')
+  .classed('window-layer', true);
+
+console.log(windowLayer);
+console.log(mapLayer);
+
 
 d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
   if (error) return console.error(error);
 
   var features = mapData.features;
 
+
   // Draw each province as a path
   mapLayer.selectAll('path')
       .data(features)
       .enter().append('path')
       .attr('d', path)
-      .attr('vector-effect', 'non-scaling-stroke')
-      .on('mouseover', mouseover)
-      .on('mouseout', mouseout);
+      .attr('vector-effect', 'non-scaling-stroke');
+      // .on('mouseover', mouseover)
+      // .on('mouseout', mouseout);
 
   // Attach name to province
   mapLayer.selectAll("text")
@@ -71,6 +98,7 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
       .text(function(d){
           return d.properties.name_eng;
       })
+      .attr('fill', 'black')
       .attr("x", function(d){
           return path.centroid(d)[0];
       })
@@ -78,30 +106,76 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
           return  path.centroid(d)[1];
       })
       .attr("text-anchor","middle")
-      .attr('font-size','6pt');
+      .attr('font-size','14px');
+
+
 
   d3.csv("data/link.csv", function(error, edges){
-      edges.forEach(function(d){
-        var p1 = projection([d.origin_lon, d.origin_lat]),
-            p2 = projection([d.dest_lon, d.dest_lat]);
-        var volume = d.count;
-        if (!p1[0] == p2[0] || !p1[1] == p2[1]){ }
-        else {
-          svg.append("line")
-		      .attr("x1", p1[0])
-		      .attr("x2", p2[0])
-		      .attr("y1", p1[1])
-		      .attr("y2", p2[1])
-		      .style("stroke", "steelblue")
-          .attr("stroke-width", volume)
-        }
-      })
+      mapLayer.selectAll("lines")
+        .data(edges)
+        .enter()
+        .append("line")
+        .attr("x1", function(d){
+          p1 = projection([d.origin_lon, d.origin_lat]);
+          p2 = projection([d.dest_lon, d.dest_lat]);
+          return p1[0];
+        })
+        .attr("x2", function(d){
+          p1 = projection([d.origin_lon, d.origin_lat]);
+          p2 = projection([d.dest_lon, d.dest_lat]);
+          return p2[0];
+        })
+        .attr("y1", function(d){
+          p1 = projection([d.origin_lon, d.origin_lat]);
+          p2 = projection([d.dest_lon, d.dest_lat]);
+          return p1[1];
+        })
+        .attr("y2", function(d){
+          p1 = projection([d.origin_lon, d.origin_lat]);
+          p2 = projection([d.dest_lon, d.dest_lat]);
+          return p2[1];
+        })
+        .style("stroke", "steelblue")
+        .attr("stroke-width", function(d){
+          return Math.round(d.count);
+        })
+        .on("mouseover", function(d){
+          d3.select(this)
+						.transition()
+						.style("stroke", "green")
+            .attr("stroke-width", function(d){
+              return (Math.round(d.count)+(Math.round(d.count)/4));
+            });
+          
+						
+        })
+        .on("mouseout", function(d){
+          d3.select(this)
+            .interrupt()
+						.transition()
+						.style("stroke", "steelblue")
+            .attr("stroke-width", function(d){
+              return Math.round(d.count);
+            });
+          windowLayer.selectAll('text').remove("text");
+          windowLayer.selectAll("rect").remove("rect");
+          
+						
+        });
+        
 
   }
+
 
 );
 
 
+
+});
+
+function info(d){
+  console.log(d.origin_name)
+}
 
 function mouseover(d){
   // Highlight hovered province
@@ -113,7 +187,25 @@ function mouseout(d){
   mapLayer.selectAll('path')
     .style('fill', "#fff");
 }
-});
+
+function origin_proj(d){
+  var projection = d3.geo.mercator()
+  .scale(9900)
+  .center([127.3845, 36.3504])
+  .translate([width / 2, height / 2]);
+  p1 = projection([d.origin_lon, d.origin_lat]);
+  return p1;
+}
+
+function dest_proj(d){
+  console.log(d);
+  var projection = d3.geo.mercator()
+  .scale(9900)
+  .center([127.3845, 36.3504])
+  .translate([width / 2, height / 2]);
+  p2 = projection([d.dest_lon, d.dest_lat]);
+  return p2;
+}
 
 
 </script>
