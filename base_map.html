@@ -34,6 +34,10 @@
 }
 
 </style>
+
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;1,400&display=swap" rel="stylesheet">
+
 <body>
 
 <svg></svg>
@@ -74,6 +78,13 @@ var windowLayer = g.append('g')
 console.log(windowLayer);
 console.log(mapLayer);
 
+let provinceNameMapping = (provinceName) => {
+  if(provinceName === "Sejongsi"){
+    return "Sejong";
+  }
+  return provinceName;
+}
+
 // Define color scale
 var color = d3.scale.linear()
   .domain([1, 25])
@@ -81,87 +92,123 @@ var color = d3.scale.linear()
   .range(['#fff', '#409A99']);
 
 
-d3.json("data/skorea-provinces-2018-geo.json")
-  .then((mapData) => {
+ let confirmCountByProvince = {};
+ let maxConfirmCount = 1
 
-  var features = mapData.features;
+  d3.csv("/data/time_province.csv", function(data) {
+      for (var i = 0; i < data.length; i++) {
+          confirmCountByProvince[data[i].province] = data[i];
+          maxConfirmCount = Math.max(data[i].confirmed, maxConfirmCount)
+      }
+      d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
+        if (error) return console.error(error);
 
-
-  // Draw each province as a path
-  mapLayer.selectAll('path')
-      .data(features)
-      .enter().append('path')
-      .attr('d', path)
-      .attr('vector-effect', 'non-scaling-stroke')
-      .attr("fill", heat_fill)
-      .on('mouseover', mouseover)
-      .on('mouseout', mouseout);
-
-  // Attach name to province
-  mapLayer.selectAll("text")
-      .data(features)
-      .enter()
-      .append("svg:text")
-      .text(function(d){
-          return d.properties.name_eng;
-      })
-      .style('fill', 'black')
-      .style('stroke', 'transparent')
-      .attr("x", function(d){
-          return path.centroid(d)[0];
-      })
-      .attr("y", function(d){
-          return  path.centroid(d)[1];
-      })
-      .attr("text-anchor","middle")
-      .attr('font-size','14px');
+        var features = mapData.features;
 
 
+        // Draw each province as a path
+        mapLayer.selectAll('path')
+            .data(features)
+            .enter().append('path')
+            .attr('d', path)
+            .attr('vector-effect', 'non-scaling-stroke')
+            .attr('transition', '1s ease-in-out')
+            .attr("fill", heat_fill)
+            .on('mouseover', mouseover)
+            .on('mouseout', mouseout);
+
+        // Attach name to province
+        mapLayer.selectAll("text")
+            .data(features)
+            .enter()
+            .append("svg:text")
+            .text(function(d){
+                return d.properties.name_eng;
+            })
+            .style('fill', 'black')
+            .style('stroke', 'transparent')
+            .attr("x", function(d){
+                return path.centroid(d)[0];
+            })
+            .attr("y", function(d){
+                return  path.centroid(d)[1];
+            })
+            .attr("text-anchor",function(d){
+              return d.properties.name_eng === "Gyeonggi-do" ? "initial" : "middle"
+            })
+            .attr("font-family", "Open Sans")
+            .attr('font-size','12px');
 
 
-});
-
-function info(d){
-  console.log(d.origin_name)
-}
-
-function mouseover(d){
-  // Highlight hovered province
-  d3.select(this).style('fill', 'orange');
-}
-
-function mouseout(d){
-  // Reset province color
-  d3.select(this)
-    .style('fill', heat_fill(d));
-}
-
-function origin_proj(d){
-  var projection = d3.geo.mercator()
-  .scale(9900)
-  .center([127.3845, 36.3504])
-  .translate([width / 2, height / 2]);
-  p1 = projection([d.origin_lon, d.origin_lat]);
-  return p1;
-}
-
-function dest_proj(d){
-  console.log(d);
-  var projection = d3.geo.mercator()
-  .scale(9900)
-  .center([127.3845, 36.3504])
-  .translate([width / 2, height / 2]);
-  p2 = projection([d.dest_lon, d.dest_lat]);
-  return p2;
-}
 
 
-// Get province color
-function heat_fill(d){
-  var name = d.properties.name_eng;
-  var length = name.length;
-  return color(length);
-}
 
+      });
+  });
+
+  function info(d){
+    console.log(d.origin_name)
+  }
+
+  function mouseover(d){
+    // Highlight hovered province
+    d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
+    d3.select(this).style('opacity', 0.5);
+    d3.select(this).style("stroke-width", 3);
+    // console.log("hi");
+    // debugger;
+  }
+
+  function mouseout(d){
+    // Reset province color
+    // d3.select(this)
+    //   .style('fill', heat_fill(d));
+    d3.select(this).style('opacity', 1);
+    d3.select(this).style("stroke-width", 1);
+  }
+
+  function origin_proj(d){
+    var projection = d3.geo.mercator()
+    .scale(9900)
+    .center([127.3845, 36.3504])
+    .translate([width / 2, height / 2]);
+    p1 = projection([d.origin_lon, d.origin_lat]);
+    return p1;
+  }
+
+  function dest_proj(d){
+    console.log(d);
+    var projection = d3.geo.mercator()
+    .scale(9900)
+    .center([127.3845, 36.3504])
+    .translate([width / 2, height / 2]);
+    p2 = projection([d.dest_lon, d.dest_lat]);
+    return p2;
+  }
+
+
+  // Get province color
+  function heat_fill(d){
+    let rawConfirmCount;
+    rawConfirmCount = parseInt(confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+
+    let scaledConfirmCount = 25 * rawConfirmCount/maxConfirmCount;
+    var name = d.properties.name_eng;
+    var length = name.length;
+    // console.log(scaledConfirmCount, provinceNameMapping(d.properties.name_eng));
+    return color(scaledConfirmCount);
+  }
+
+  var colorLegend = d3.legend.color()
+          .labelFormat(d3.format(".0f"))
+          .scale(color)
+          .shapePadding(0)
+          .shapeWidth(10)
+          .shapeHeight(20)
+          .labelOffset(12);
+
+  svg.append("g")
+          .attr("transform", "translate(10, 10)")
+          .call(colorLegend);
 
 </script>
