@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+/* CSS goes here. */
+.background {
+  fill: #eee;
+  pointer-events: all;
+}
+
+.map-layer {
+  fill: #fff;
+  stroke: #aaa;
+}
+
+.window-layer{
+  fill : white;
+  stroke: black;
+}
+
+#tooltip {
+  background: rgba(255, 255, 255, 0.92);
+  position:absolute;
+  height:auto;
+  visibility:hidden;
+  z-index:9999;
+  padding:5px;
+  border: 1px solid #ddd;
+  padding: 5px 15px 5px 15px;
+  font-family: arial, sans-serif;
+  -webkit-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+</style>
+<body>
+
+<svg></svg>
+<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/topojson.v3.min.js"></script>
+<script>
+
+/* JavaScript goes here. */
+var width = 960,
+    height = 1150;
+
+var projection = d3.geo.mercator()
+  .scale(9900)
+  .center([127.3845, 36.3504])
+  .translate([width / 2, height / 2]);
+
+var path = d3.geo.path()
+  .projection(projection);
+
+var svg = d3.select('svg')
+  .attr('width', width)
+  .attr('height', height);
+
+svg.append('rect')
+  .attr('class', 'background')
+  .attr('width', width)
+  .attr('height', height);
+
+
+var g = svg.append('g');
+
+var mapLayer = g.append('g')
+  .classed('map-layer', true);
+
+var windowLayer = g.append('g')
+  .classed('window-layer', true);
+
+console.log(windowLayer);
+console.log(mapLayer);
+
+// Define color scale
+var color = d3.scale.linear()
+  .domain([1, 25])
+  .clamp(true)
+  .range(['#fff', '#409A99']);
+
+
+d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
+  if (error) return console.error(error);
+
+  var features = mapData.features;
+
+
+  // Draw each province as a path
+  mapLayer.selectAll('path')
+      .data(features)
+      .enter().append('path')
+      .attr('d', path)
+      .attr('vector-effect', 'non-scaling-stroke')
+      .attr("fill", heat_fill)
+      .on('mouseover', mouseover)
+      .on('mouseout', mouseout);
+
+  // Attach name to province
+  mapLayer.selectAll("text")
+      .data(features)
+      .enter()
+      .append("svg:text")
+      .text(function(d){
+          return d.properties.name_eng;
+      })
+      .style('fill', 'black')
+      .style('stroke', 'transparent')
+      .attr("x", function(d){
+          return path.centroid(d)[0];
+      })
+      .attr("y", function(d){
+          return  path.centroid(d)[1];
+      })
+      .attr("text-anchor","middle")
+      .attr('font-size','14px');
+
+
+
+
+});
+
+function info(d){
+  console.log(d.origin_name)
+}
+
+function mouseover(d){
+  // Highlight hovered province
+  d3.select(this).style('fill', 'orange');
+}
+
+function mouseout(d){
+  // Reset province color
+  d3.select(this)
+    .style('fill', heat_fill(d));
+}
+
+function origin_proj(d){
+  var projection = d3.geo.mercator()
+  .scale(9900)
+  .center([127.3845, 36.3504])
+  .translate([width / 2, height / 2]);
+  p1 = projection([d.origin_lon, d.origin_lat]);
+  return p1;
+}
+
+function dest_proj(d){
+  console.log(d);
+  var projection = d3.geo.mercator()
+  .scale(9900)
+  .center([127.3845, 36.3504])
+  .translate([width / 2, height / 2]);
+  p2 = projection([d.dest_lon, d.dest_lat]);
+  return p2;
+}
+
+
+// Get province color
+function heat_fill(d){
+  var name = d.properties.name_eng;
+  var length = name.length;
+  return color(length);
+}
+
+
+</script>
