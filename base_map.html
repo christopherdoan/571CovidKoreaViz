@@ -37,7 +37,7 @@
 <body>
 
 <svg></svg>
-<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3.v6.js"></script>
 <script src="https://d3js.org/topojson.v3.min.js"></script>
 <script>
 
@@ -45,12 +45,12 @@
 var width = 960,
     height = 1150;
 
-var projection = d3.geo.mercator()
+var projection = d3.geoMercator()
   .scale(9900)
   .center([127.3845, 36.3504])
   .translate([width / 2, height / 2]);
 
-var path = d3.geo.path()
+var path = d3.geoPath()
   .projection(projection);
 
 var svg = d3.select('svg')
@@ -75,10 +75,10 @@ console.log(windowLayer);
 console.log(mapLayer);
 
 
-d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
-  if (error) return console.error(error);
+d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
 
   var features = mapData.features;
+  console.log(features);
 
 
   // Draw each province as a path
@@ -110,7 +110,9 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
 
 
 
-  d3.csv("data/link.csv", function(error, edges){
+  d3.csv("data/link.csv")
+  .then((edges) =>{
+
       mapLayer.selectAll("lines")
         .data(edges)
         .enter()
@@ -150,6 +152,7 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
 						
         })
         .on("mouseout", function(d){
+          console.log(d.count);
           d3.select(this)
             .interrupt()
 						.transition()
@@ -164,7 +167,10 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
         })
         .on("click",function(d){
 
-          // console.log(window);
+          var tempData = d3.select(this).data()[0];
+
+          // console.log(d3.select(this).data()[0].origin_name);
+
           windowLayer
             .append("rect")
             // .attr("fill", "white")
@@ -178,39 +184,44 @@ d3.json("data/skorea-provinces-2018-geo.json", function(error, mapData) {
             .attr("fill", "white")
             .attr('stroke', 'black')
             .attr('stroke-width', '4px')
-            .attr('x',origin_proj(d)[0]-250)
-            .attr('y', origin_proj(d)[1]-250)
+            .attr('x',origin_proj(tempData)[0]-250)
+            .attr('y', origin_proj(tempData)[1]-250)
             .attr('width', 250)
             .attr('height', 150)
             .attr("fill-opacity", "80%");
+            
 
           windowLayer.append("text")
-            .text("Origin: " + d.origin_name)
+            .text("Origin: " + tempData.origin_name)
             .attr('fill', 'black')
-            .attr('x',origin_proj(d)[0]-240)
-            .attr('y', origin_proj(d)[1]-200)
+            .style('stroke', 'transparent')
+            .attr('x',origin_proj(tempData)[0]-240)
+            .attr('y', origin_proj(tempData)[1]-200)
             // .attr("text-anchor","middle")
             .attr('font-size','16px');
-
+          
+          
           windowLayer.append("text")
-            .text("Destination: " + d.dest_name)
+            .text("Destination: " + tempData.dest_name)
             .attr('fill', 'black')
-            .attr('x',origin_proj(d)[0]-240)
-            .attr('y', origin_proj(d)[1]-180)
+            .style('stroke', 'transparent')
+            .attr('x',origin_proj(tempData)[0]-240)
+            .attr('y', origin_proj(tempData)[1]-180)
             // .attr("text-anchor","middle")
             .attr('font-size','16px');
           windowLayer.append("text")
-            .text("Count: " + Math.round(d.count) + " infections")
+            .text("Count: " + Math.round(tempData.count) + " infections")
             .attr('fill', 'black')
-            .attr('x',origin_proj(d)[0]-240)
-            .attr('y', origin_proj(d)[1]-160)
+            .style('stroke', 'transparent')
+            .attr('x',origin_proj(tempData)[0]-240)
+            .attr('y', origin_proj(tempData)[1]-160)
             // .attr("text-anchor","middle")
             .attr('font-size','16px');
           windowLayer.append("text")
             .text("DETAILS")
             .attr('fill', 'black')
-            .attr('x',origin_proj(d)[0]-170)
-            .attr('y', origin_proj(d)[1]-220)
+            .attr('x',origin_proj(tempData)[0]-170)
+            .attr('y', origin_proj(tempData)[1]-220)
             // .attr("text-anchor","middle")
             .attr('font-size','16px');
 
@@ -242,7 +253,7 @@ function mouseout(d){
 }
 
 function origin_proj(d){
-  var projection = d3.geo.mercator()
+  var projection = d3.geoMercator()
   .scale(9900)
   .center([127.3845, 36.3504])
   .translate([width / 2, height / 2]);
@@ -252,7 +263,7 @@ function origin_proj(d){
 
 function dest_proj(d){
   console.log(d);
-  var projection = d3.geo.mercator()
+  var projection = d3.geoMercator()
   .scale(9900)
   .center([127.3845, 36.3504])
   .translate([width / 2, height / 2]);
