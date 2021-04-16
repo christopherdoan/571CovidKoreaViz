@@ -50,7 +50,7 @@
             
             myDataPromises.then(function(data){
 
-                currDataset = data[0]
+                currDataset = data[1]
                 
                 xScale = d3.scaleTime()
 							   .domain(d3.extent(currDataset, function(d) { return d.date; }))

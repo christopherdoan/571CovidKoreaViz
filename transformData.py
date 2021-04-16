@@ -49,7 +49,7 @@ for cnt in range(len(dataframes[0])-1):
 
     date = timeVal.date
     total_c = timeVal.confirmed
-    total_d = timeVal.confirmed
+    total_d = timeVal.deceased
     
     #set gender column counts
     if date == timeGenderVal.date and timeGenderVal.sex == 'male':
@@ -100,18 +100,11 @@ for cnt in range(len(dataframes[0])-1):
         age_80_d = timeAge.deceased
         timeAge = next(timeAgeCSV)[1]
 
-    if (date == '2020-03-02'):
-        print(cnt, male_c)
-    if (male_c == 0):
-        print(cnt)
     conf_row = {'date': date, 'total': total_c, 'male': male_c, 'female': female_c, 'age_0':age_0_c, 'age_10':age_10_c, 'age_20': age_20_c, 'age_30': age_30_c, 'age_40': age_40_c, 'age_50': age_50_c, 'age_60': age_60_c, 'age_70': age_70_c, 'age_80': age_80_c}
     dec_row = {'date': date, 'total': total_d, 'male': male_d, 'female': female_d, 'age_0':age_0_d, 'age_10':age_10_d, 'age_20': age_20_d, 'age_30': age_30_d, 'age_40': age_40_d, 'age_50': age_50_d, 'age_60': age_60_d, 'age_70': age_70_d, 'age_80': age_80_d}
     dataframes[3] = dataframes[3].append(conf_row, ignore_index=True, sort=False)
     dataframes[4] = dataframes[4].append(dec_row, ignore_index=True, sort=False)
 
-conf_df = dataframes[3]
-print(conf_df[conf_df['date'] == '2020-03-02'])
-print(len(conf_df))
 dataframes[3].to_csv(r'C:\Users\Corey\Documents\571CovidKoreaViz\data\ConfirmedData.csv', index=False, header=True)
 dataframes[4].to_csv(r'C:\Users\Corey\Documents\571CovidKoreaViz\data\DeceasedData.csv', index=False, header=True)
    
