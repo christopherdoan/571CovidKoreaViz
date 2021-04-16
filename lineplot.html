@@ -28,29 +28,38 @@
             var rowConverter = function(d) {
 				return {
 					date : d3.timeParse("%Y-%m-%d")(d.date),
-                    confirmed: parseInt(d.confirmed),
-                    deceased: parseInt(d.deceased),
-                    age: parseInt(d.age),
-                    sex: d.sex
+                    total: parseInt(d.total),
+                    male: parseInt(d.male),
+                    female: parseInt(d.female),
+                    age_0: parseInt(d.age_0),
+                    age_10: parseInt(d.age_10),
+                    age_20: parseInt(d.age_20),
+                    age_30: parseInt(d.age_30),
+                    age_40: parseInt(d.age_40),
+                    age_50: parseInt(d.age_50),
+                    age_60: parseInt(d.age_60),
+                    age_70: parseInt(d.age_70),
+                    age_80: parseInt(d.age_80)
 				}
                 ;
 			}
             
-            var promises = [d3.csv("/data/Time.csv", rowConverter), 
-                d3.csv("/data/TimeAge.csv", rowConverter), 
-                d3.csv("/data/TimeGender.csv", rowConverter)];
+            var promises = [d3.csv("/data/ConfirmedData.csv", rowConverter), 
+                d3.csv("/data/DeceasedData.csv", rowConverter)];
             var myDataPromises = Promise.all(promises);
             
             myDataPromises.then(function(data){
+
+                currDataset = data[0]
                 
                 xScale = d3.scaleTime()
-							   .domain(d3.extent(data[0], function(d) { return d.date; }))
+							   .domain(d3.extent(currDataset, function(d) { return d.date; }))
 							   .range([padding, width - padding * 2]);
 
                 yScale = d3.scaleLinear()
 							   .domain([
-									d3.max(data[0], function(d) { return d.confirmed; }),
-                                    d3.min(data[0], function(d) { return d.confirmed; })
+									d3.max(currDataset, function(d) { return d.total; }),
+                                    d3.min(currDataset, function(d) { return d.total; })
 								])
 							   .range([ padding, height - padding]);
     
@@ -70,13 +79,13 @@
                     .call(yAxis);
 
                 svg.append("path")
-                    .datum(data[0])
+                    .datum(currDataset)
                     .attr("fill", "none")
                     .attr("stroke", "steelblue")
                     .attr("stroke-width", 1.5)
                     .attr("d", d3.line()
                         .x(function(d) { return xScale(d.date) })
-                        .y(function(d) { return yScale(d.confirmed) })
+                        .y(function(d) { return yScale(d.total) })
                         )
             });
         
