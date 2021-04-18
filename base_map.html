@@ -139,15 +139,18 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
           return p2[1];
         })
         .style("stroke", "steelblue")
+        // .style("stroke", function(d){
+        //   return "rgb(200, 150,"+d.count*255/30 +")";
+        // })
         .attr("stroke-width", function(d){
-          return Math.round(d.count);
+          return Math.log(Math.round(d.count)*6);
         })
         .on("mouseover", function(d){
           d3.select(this)
 						.transition()
 						.style("stroke", "green")
             .attr("stroke-width", function(d){
-              return (Math.round(d.count)+(Math.round(d.count)/4));
+              return Math.log(Math.round(d.count)*10);
             });
           
 						
@@ -156,10 +159,10 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
           console.log(d.count);
           d3.select(this)
             .interrupt()
-						.transition()
+						.transition(2500)
 						.style("stroke", "steelblue")
             .attr("stroke-width", function(d){
-              return Math.round(d.count);
+              return Math.log(Math.round(d.count)*6);
             });
           windowLayer.selectAll('text').remove("text");
           windowLayer.selectAll("rect").remove("rect");
