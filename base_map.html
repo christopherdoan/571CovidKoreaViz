@@ -92,8 +92,8 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
         .enter().append('path')
         .attr('d', path)
         .attr('vector-effect', 'non-scaling-stroke')
-        // .on('mouseover', mouseover)
-        // .on('mouseout', function(d){})
+        .on('mouseover', function(d){d3.select(this).style("stroke-width", 3)})
+        .on('mouseout', function(d){d3.select(this).style("stroke-width", 1)})
         .on("click", function(d){
           var tempData = d3.select(this).data()[0];
           console.log(tempData.properties.name_eng)
@@ -293,8 +293,10 @@ function redraw(){
     mapLayer.selectAll("line")
       .data(edges)
       .enter()
-      .transition()
       .append("line")
+      .transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
       .attr("x1", function(d){
             p1 = projection([d.origin_lon, d.origin_lat]);
             p2 = projection([d.dest_lon, d.dest_lat]);
@@ -321,7 +323,9 @@ function redraw(){
           })
           .attr("stroke-width", function(d){
             return Math.log(Math.round(d.count)*6);
-          })
+          });
+
+          mapLayer.selectAll("line")
           .on("mouseover", function(d){
             d3.select(this)
               .transition()
