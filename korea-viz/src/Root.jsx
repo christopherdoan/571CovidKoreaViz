@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { Layout } from 'antd';
 
-import 'antd/dist/antd.css';
+import Map from './Views/Map.jsx';
+import VisOverlay from './VisOverlay.jsx';
+import ScrollingText from './ScrollingText.jsx';
 
+import 'antd/dist/antd.css';
 import './Root.css';
 
 const { Sider, Content, Footer, Header } = Layout;
@@ -10,16 +13,39 @@ const { Sider, Content, Footer, Header } = Layout;
 class Root extends Component {
   constructor(props) {
     super(props);
+    this.setMode = this.setMode.bind(this);
+    this.state = {
+      mode: undefined
+    }
+  }
+  setMode(mode){
+    this.setState({mode: mode});
   }
   render() {
     return <Layout>
-              <Header>Overview: The COVID-19 Crisis in South Korea</Header>
-              <Layout>
-                <Sider>left sidebar</Sider>
-                <Content>main content</Content>
-                <Sider>right sidebar</Sider>
+              <Header>
+                <div className="header">
+                  <h1>Overview: The COVID-19 Crisis in South Korea</h1>
+                  <h3><em>Doan, C., Liu, Y., Kozlovski, C., Uppal, A.</em></h3>
+                </div>
+              </Header>
+              <Layout className="visualizations">
+                <Sider>
+                  <Map setMode={this.setMode}/>
+                </Sider>
+                <Content>
+                  <div className="time-series">
+                    Time Series
+                  </div>
+                  <div className="word-cloud">
+                    Word Cloud
+                  </div>
+                </Content>
               </Layout>
-              <Footer>footer</Footer>
+              <Footer>
+                <ScrollingText />
+              </Footer>
+              <VisOverlay mode={this.state.mode} setMode={this.setMode}/>
             </Layout>;
   }
 }
