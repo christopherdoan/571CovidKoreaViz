@@ -38,7 +38,7 @@
   <input name="resetButton" 
            type="button" 
            value="Reset Map" 
-           onclick="redraw()" />
+           onclick="display()" />
 
 <svg></svg>
 <script src="https://d3js.org/d3.v6.js"></script>
@@ -97,11 +97,30 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
         .on("click", function(d){
           var tempData = d3.select(this).data()[0];
           console.log(tempData.properties.name_eng)
+
+          // const makeRequest = async () => {
+          //     await display()
+
+          //     mapLayer.selectAll("line")
+          //       .filter(function(d){
+          //           return d3.select(this).data()[0].origin_name != tempData.properties.name_eng && 
+          //           d3.select(this).data()[0].dest_name != tempData.properties.name_eng;
+          //       })
+          //       .remove();
+          //   }
+
+          // makeRequest()
+
+          
+          // display()
+          
           mapLayer.selectAll("line")
            .filter(function(d){
-             return d3.select(this).data()[0].origin_name != tempData.properties.name_eng;
+             return d3.select(this).data()[0].origin_name != tempData.properties.name_eng && 
+             d3.select(this).data()[0].dest_name != tempData.properties.name_eng;
            })
            .remove();
+           
         });
 
     // Attach name to province
@@ -123,6 +142,22 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
         .attr("text-anchor","middle")
         .attr('font-size','13px');
         console.log(typeof edges);
+      });
+      
+      //draw node-link on the map
+      display()
+
+}
+
+
+);
+
+
+
+
+function display(){
+  d3.csv("data/link.csv")
+  .then((edges) =>{
 
         let names = [];
 
@@ -170,9 +205,6 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
             console.log(i);
             return linkScale(i);
           })
-          // .style("stroke", function(d){
-          //   return "rgb(200, 150,"+d.count*255/30 +")";
-          // })
           .attr("stroke-width", function(d){
             return Math.log(Math.round(d.count)*6);
           })
@@ -182,9 +214,7 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
               .style("stroke", "red")
               .attr("stroke-width", function(d){
                 return Math.log(Math.round(d.count)*35);
-              });
-            
-              
+              });    
           })
           .on("mouseout", function(d,i){
             d3.select(this)
@@ -197,9 +227,7 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
                 return Math.log(Math.round(d.count)*6);
               });
             windowLayer.selectAll('text').remove("text");
-            windowLayer.selectAll("rect").remove("rect");
-            
-              
+            windowLayer.selectAll("rect").remove("rect");   
           })
         
           .on("click",function(d){
@@ -261,153 +289,152 @@ d3.json("data/skorea-provinces-2018-geo.json").then((mapData) => {
 
 
 );
-
-
-
-});
-
-function redraw(){
-  d3.csv("data/link.csv")
-  .then((edges) =>{
-
-    let names = [];
-
-    edges.forEach(function(element, index) {names.push(index);});
-    edges.forEach(function(element, index) {edges[index].index = index;});
-
-    console.log(names)
-
-    var linkScale = d3.scaleOrdinal()
-      .domain(names)
-      .range(["#1b70fc", "#faff16", "#d50527", "#158940", "#f898fd", 
-      "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", 
-      "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", 
-      "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", 
-      "#8a91a7", "#88fc07", "#ea42fe", "#9e8010", "#10b437", "#c281fe", 
-      "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", 
-      "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", 
-      "#989e5d", "#fe9169"]);
-
-    mapLayer.selectAll("line").remove();
-
-    mapLayer.selectAll("line")
-      .data(edges)
-      .enter()
-      .append("line")
-      .transition()
-      .duration(500)
-      .delay(function(d, i) { return i * 10; })
-      .attr("x1", function(d){
-            p1 = projection([d.origin_lon, d.origin_lat]);
-            p2 = projection([d.dest_lon, d.dest_lat]);
-            return p1[0];
-          })
-          .attr("x2", function(d){
-            p1 = projection([d.origin_lon, d.origin_lat]);
-            p2 = projection([d.dest_lon, d.dest_lat]);
-            return p2[0];
-          })
-          .attr("y1", function(d){
-            p1 = projection([d.origin_lon, d.origin_lat]);
-            p2 = projection([d.dest_lon, d.dest_lat]);
-            return p1[1];
-          })
-          .attr("y2", function(d){
-            p1 = projection([d.origin_lon, d.origin_lat]);
-            p2 = projection([d.dest_lon, d.dest_lat]);
-            return p2[1];
-          })
-          .style("stroke", function(d,i){
-            console.log(i);
-            return linkScale(i);
-          })
-          .attr("stroke-width", function(d){
-            return Math.log(Math.round(d.count)*6);
-          });
-
-          mapLayer.selectAll("line")
-          .on("mouseover", function(d){
-            d3.select(this)
-              .transition()
-              .style("stroke", "red")
-              .attr("stroke-width", function(d){
-                return Math.log(Math.round(d.count)*35);
-              });
-            
-              
-          })
-          .on("mouseout", function(d,i){
-            d3.select(this)
-              .interrupt()
-              .transition(2500)
-              .style("stroke", function(d,i){
-            return linkScale(d.index);
-          })
-              .attr("stroke-width", function(d){
-                return Math.log(Math.round(d.count)*6);
-              });
-            windowLayer.selectAll('text').remove("text");
-            windowLayer.selectAll("rect").remove("rect");
-            
-              
-          })
-        
-          .on("click",function(d){
-
-            var tempData = d3.select(this).data()[0];
-
-            // console.log(d3.select(this).data()[0].origin_name);
-
-            windowLayer
-              .append("rect")
-              .attr("fill", "white")
-              .attr('stroke', 'black')
-              .attr('stroke-width', '4px')
-              .attr('x',origin_proj(tempData)[0]-150)
-              .attr('y', origin_proj(tempData)[1]-300)
-              .attr('width', 250)
-              .attr('height', 150)
-              .attr("fill-opacity", "80%");
-              
-
-            windowLayer.append("text")
-              .text("Origin: " + tempData.origin_name)
-              .attr('fill', 'black')
-              .style('stroke', 'transparent')
-              .attr('x',origin_proj(tempData)[0]-140)
-              .attr('y', origin_proj(tempData)[1]-250)
-              // .attr("text-anchor","middle")
-              .attr('font-size','16px');
-
-
-            windowLayer.append("text")
-              .text("Destination: " + tempData.dest_name)
-              .attr('fill', 'black')
-              .style('stroke', 'transparent')
-              .attr('x',origin_proj(tempData)[0]-140)
-              .attr('y', origin_proj(tempData)[1]-230)
-              // .attr("text-anchor","middle")
-              .attr('font-size','16px');
-            windowLayer.append("text")
-              .text("Count: " + Math.round(tempData.count) + " infections")
-              .attr('fill', 'black')
-              .style('stroke', 'transparent')
-              .attr('x',origin_proj(tempData)[0]-140)
-              .attr('y', origin_proj(tempData)[1]-210)
-              // .attr("text-anchor","middle")
-              .attr('font-size','16px');
-            windowLayer.append("text")
-              .text("DETAILS")
-              .attr('fill', 'black')
-              .attr('x',origin_proj(tempData)[0]-70)
-              .attr('y', origin_proj(tempData)[1]-270)
-              // .attr("text-anchor","middle")
-              .attr('font-size','16px');
-
-
-          });
-  });
 }
+
+
+
+// function redraw(){
+//   d3.csv("data/link.csv")
+//   .then((edges) =>{
+
+//     let names = [];
+
+//     edges.forEach(function(element, index) {names.push(index);});
+//     edges.forEach(function(element, index) {edges[index].index = index;});
+
+//     console.log(names)
+
+//     var linkScale = d3.scaleOrdinal()
+//       .domain(names)
+//       .range(["#1b70fc", "#faff16", "#d50527", "#158940", "#f898fd", 
+//       "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", 
+//       "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", 
+//       "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", 
+//       "#8a91a7", "#88fc07", "#ea42fe", "#9e8010", "#10b437", "#c281fe", 
+//       "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", 
+//       "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", 
+//       "#989e5d", "#fe9169"]);
+
+//     mapLayer.selectAll("line").remove();
+
+//     mapLayer.selectAll("line")
+//       .data(edges)
+//       .enter()
+//       .append("line")
+//       .transition()
+//       .duration(500)
+//       .delay(function(d, i) { return i * 10; })
+//       .attr("x1", function(d){
+//             p1 = projection([d.origin_lon, d.origin_lat]);
+//             p2 = projection([d.dest_lon, d.dest_lat]);
+//             return p1[0];
+//           })
+//           .attr("x2", function(d){
+//             p1 = projection([d.origin_lon, d.origin_lat]);
+//             p2 = projection([d.dest_lon, d.dest_lat]);
+//             return p2[0];
+//           })
+//           .attr("y1", function(d){
+//             p1 = projection([d.origin_lon, d.origin_lat]);
+//             p2 = projection([d.dest_lon, d.dest_lat]);
+//             return p1[1];
+//           })
+//           .attr("y2", function(d){
+//             p1 = projection([d.origin_lon, d.origin_lat]);
+//             p2 = projection([d.dest_lon, d.dest_lat]);
+//             return p2[1];
+//           })
+//           .style("stroke", function(d,i){
+//             console.log(i);
+//             return linkScale(i);
+//           })
+//           .attr("stroke-width", function(d){
+//             return Math.log(Math.round(d.count)*6);
+//           });
+
+//           mapLayer.selectAll("line")
+//           .on("mouseover", function(d){
+//             d3.select(this)
+//               .transition()
+//               .style("stroke", "red")
+//               .attr("stroke-width", function(d){
+//                 return Math.log(Math.round(d.count)*35);
+//               });
+            
+              
+//           })
+//           .on("mouseout", function(d,i){
+//             d3.select(this)
+//               .interrupt()
+//               .transition(2500)
+//               .style("stroke", function(d,i){
+//             return linkScale(d.index);
+//           })
+//               .attr("stroke-width", function(d){
+//                 return Math.log(Math.round(d.count)*6);
+//               });
+//             windowLayer.selectAll('text').remove("text");
+//             windowLayer.selectAll("rect").remove("rect");
+            
+              
+//           })
+        
+//           .on("click",function(d){
+
+//             var tempData = d3.select(this).data()[0];
+
+//             // console.log(d3.select(this).data()[0].origin_name);
+
+//             windowLayer
+//               .append("rect")
+//               .attr("fill", "white")
+//               .attr('stroke', 'black')
+//               .attr('stroke-width', '4px')
+//               .attr('x',origin_proj(tempData)[0]-150)
+//               .attr('y', origin_proj(tempData)[1]-300)
+//               .attr('width', 250)
+//               .attr('height', 150)
+//               .attr("fill-opacity", "80%");
+              
+
+//             windowLayer.append("text")
+//               .text("Origin: " + tempData.origin_name)
+//               .attr('fill', 'black')
+//               .style('stroke', 'transparent')
+//               .attr('x',origin_proj(tempData)[0]-140)
+//               .attr('y', origin_proj(tempData)[1]-250)
+//               // .attr("text-anchor","middle")
+//               .attr('font-size','16px');
+
+
+//             windowLayer.append("text")
+//               .text("Destination: " + tempData.dest_name)
+//               .attr('fill', 'black')
+//               .style('stroke', 'transparent')
+//               .attr('x',origin_proj(tempData)[0]-140)
+//               .attr('y', origin_proj(tempData)[1]-230)
+//               // .attr("text-anchor","middle")
+//               .attr('font-size','16px');
+//             windowLayer.append("text")
+//               .text("Count: " + Math.round(tempData.count) + " infections")
+//               .attr('fill', 'black')
+//               .style('stroke', 'transparent')
+//               .attr('x',origin_proj(tempData)[0]-140)
+//               .attr('y', origin_proj(tempData)[1]-210)
+//               // .attr("text-anchor","middle")
+//               .attr('font-size','16px');
+//             windowLayer.append("text")
+//               .text("DETAILS")
+//               .attr('fill', 'black')
+//               .attr('x',origin_proj(tempData)[0]-70)
+//               .attr('y', origin_proj(tempData)[1]-270)
+//               // .attr("text-anchor","middle")
+//               .attr('font-size','16px');
+
+
+//           });
+//   });
+// }
 
 function info(d){
   console.log(d.origin_name)
