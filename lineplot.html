@@ -51,7 +51,7 @@
          
 
             // draw actual plots with selected data
-            function drawLinePlot(typeOfResult, ){
+            function drawLinePlot(){
 
                 // remove old graph from svg
                 svg.selectAll("*").remove();
@@ -95,8 +95,9 @@
                                             }
 
                                             // create/update sexRatio value used to caluculate per age group
-                                            sexRatio = d.curr_value/d.total
-
+                                            if (d.total != 0){
+                                                sexRatio = d.curr_value/d.total;
+                                            }
                                             // arr of counts for each age group, used in tandem with ageArr to select the correct age groups
                                             var ageArrValues = [d.age_0, d.age_10, d.age_20, d.age_30, d.age_40, d.age_50, d.age_60, d.age_70, d.age_80];
                                             
@@ -107,7 +108,8 @@
                                                     subtotal = subtotal + ageArrValues[i];
                                                 }
                                             }
-                                            // apply ratio to subtotal 
+                                            // apply ratio to subtotal
+                                            
                                             d.curr_value = Math.round(subtotal * sexRatio);
                                             return d.curr_value; 
                                         }),
@@ -142,9 +144,8 @@
                 });
             }
         
-            
+            drawLinePlot();
 		</script>
-        <button type="button" onclick="drawLinePlot()">Click Me!</button>
         <form action="" onclick="drawLinePlot()">
             <p>Covid Trends by:</p>
             <input type="radio" id="confirmed" name="val" value="Confirmed" checked>
