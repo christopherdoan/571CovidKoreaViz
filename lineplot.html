@@ -144,7 +144,51 @@
                 });
             }
         
-            drawLinePlot();
+            drawPreview();
+
+
+            // used for html preview, just shows confirmed/dates on lineplot
+            function drawPreview(){
+                myDataPromises.then(function(data){
+                    data = data[0];
+              
+                    xScale = d3.scaleTime()
+                                .domain(d3.extent(data, function(d) { return d.date; }))
+                                .range([padding, width - padding * 2]);
+
+                    yScale = d3.scaleLinear()
+                                .domain([
+                                        d3.max(data, function(d) { return d.total; }),
+                                        d3.min(data, function(d) { return d.total; })
+                                    ])
+                                .range([ padding, height - padding]);
+        
+                    var xAxis = d3.axisBottom()
+                        .scale(xScale);
+                    
+                    var yAxis = d3.axisLeft()
+                        .scale(yScale);
+
+                    svg.append("g")
+                        .attr("transform", "translate(0," + (height - padding) + ")")
+                        .call(xAxis);
+
+                    svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + (padding) + ",0)")
+                        .call(yAxis);
+
+                    svg.append("path")
+                        .datum(data)
+                        .attr("fill", "none")
+                        .attr("stroke", "steelblue")
+                        .attr("stroke-width", 1.5)
+                        .attr("d", d3.line()
+                            .x(function(d) { return xScale(d.date) })
+                            .y(function(d) { return yScale(d.total) })
+                            )
+                });
+            }
 		</script>
         <form action="" onclick="drawLinePlot()">
             <p>Covid Trends by:</p>
