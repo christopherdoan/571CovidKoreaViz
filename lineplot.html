@@ -4,11 +4,11 @@
 		<meta charset="utf-8">
 		<title>Time Series Plot</title>
 		<script type="text/javascript" src="https://d3js.org/d3.v6.min.js"></script>
-		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	</head>
 	<body>
+        
 		<script type="text/javascript">
-
 			//Width and height
 			var width = 1000;
 			var height = 600;
@@ -24,7 +24,7 @@
             var xScale = d3.scaleTime().range([padding, width - padding * 2]);
             var yScale = d3.scaleLinear().range ([height - padding, padding]);
 
-            //Dates Data
+            //Dates Data conversion
             var rowConverter = function(d) {
 				return {
 					date : d3.timeParse("%Y-%m-%d")(d.date),
@@ -39,57 +39,167 @@
                     age_50: parseInt(d.age_50),
                     age_60: parseInt(d.age_60),
                     age_70: parseInt(d.age_70),
-                    age_80: parseInt(d.age_80)
-				}
-                ;
+                    age_80: parseInt(d.age_80),
+                    curr_value: 0
+				};
 			}
             
+            // load datasets
             var promises = [d3.csv("/data/ConfirmedData.csv", rowConverter), 
                 d3.csv("/data/DeceasedData.csv", rowConverter)];
             var myDataPromises = Promise.all(promises);
-            
-            myDataPromises.then(function(data){
+         
 
-                currDataset = data[1]
-                
-                xScale = d3.scaleTime()
-							   .domain(d3.extent(currDataset, function(d) { return d.date; }))
-							   .range([padding, width - padding * 2]);
+            // draw actual plots with selected data
+            function drawLinePlot(typeOfResult, ){
 
-                yScale = d3.scaleLinear()
-							   .domain([
-									d3.max(currDataset, function(d) { return d.total; }),
-                                    d3.min(currDataset, function(d) { return d.total; })
-								])
-							   .range([ padding, height - padding]);
-    
-                var xAxis = d3.axisBottom()
-					.scale(xScale);
-                
-                var yAxis = d3.axisLeft()
-					.scale(yScale);
+                // remove old graph from svg
+                svg.selectAll("*").remove();
 
-                svg.append("g")
-                    .attr("transform", "translate(0," + (height - padding) + ")")
-                    .call(xAxis);
+                // draw new graph
+                myDataPromises.then(function(data){
 
-                svg.append("g")
-                    .attr("class", "axis")
-                    .attr("transform", "translate(" + (padding) + ",0)")
-                    .call(yAxis);
+                    // default dataset is confirmed, check if deceased is selected instead
+                    currDataset = data[0];
+                    if (document.getElementById("deceased").checked){
+                        currDataset = data[1];
+                    }
+                    
+                    // look at checked values and 
+                    var maleCheck = document.getElementById("male").checked;
+                    var femaleCheck = document.getElementById("female").checked;
 
-                svg.append("path")
-                    .datum(currDataset)
-                    .attr("fill", "none")
-                    .attr("stroke", "steelblue")
-                    .attr("stroke-width", 1.5)
-                    .attr("d", d3.line()
-                        .x(function(d) { return xScale(d.date) })
-                        .y(function(d) { return yScale(d.total) })
-                        )
-            });
+                    // create ratio variable for future calcuations in relation to age groups
+                    var sexRatio = 1;
+
+                    // arr of T/F values correlated to diff age groups, used for future calculations
+                    var ageArr = [document.getElementById("0s").checked, document.getElementById("10s").checked, document.getElementById("20s").checked,
+                        document.getElementById("30s").checked, document.getElementById("40s").checked, document.getElementById("50s").checked, 
+                        document.getElementById("60s").checked, document.getElementById("70s").checked, document.getElementById("80s").checked];
+                    
+                    xScale = d3.scaleTime()
+                                .domain(d3.extent(currDataset, function(d) { return d.date; }))
+                                .range([padding, width - padding * 2]);
+
+                    yScale = d3.scaleLinear()
+                                .domain([
+                                        d3.max(currDataset, function(d) { 
+
+                                            // check sex distributions and modify working data
+                                            if (maleCheck && !femaleCheck){
+                                                d.curr_value = d.male;
+                                            } else if (femaleCheck && !maleCheck){
+                                                d.curr_value = d.female;
+                                            } else {
+                                                d.curr_value = d.total;
+                                            }
+
+                                            // create/update sexRatio value used to caluculate per age group
+                                            sexRatio = d.curr_value/d.total
+
+                                            // arr of counts for each age group, used in tandem with ageArr to select the correct age groups
+                                            var ageArrValues = [d.age_0, d.age_10, d.age_20, d.age_30, d.age_40, d.age_50, d.age_60, d.age_70, d.age_80];
+                                            
+                                            // calcuate subtotal based on age groups
+                                            var subtotal = 0;
+                                            for (var i = 0; i < 9; i++){
+                                                if (ageArr[i]){
+                                                    subtotal = subtotal + ageArrValues[i];
+                                                }
+                                            }
+                                            // apply ratio to subtotal 
+                                            d.curr_value = Math.round(subtotal * sexRatio);
+                                            return d.curr_value; 
+                                        }),
+                                        d3.min(currDataset, function(d) { return d.curr_value; })
+                                    ])
+                                .range([ padding, height - padding]);
+        
+                    var xAxis = d3.axisBottom()
+                        .scale(xScale);
+                    
+                    var yAxis = d3.axisLeft()
+                        .scale(yScale);
+
+                    svg.append("g")
+                        .attr("transform", "translate(0," + (height - padding) + ")")
+                        .call(xAxis);
+
+                    svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + (padding) + ",0)")
+                        .call(yAxis);
+
+                    svg.append("path")
+                        .datum(currDataset)
+                        .attr("fill", "none")
+                        .attr("stroke", "steelblue")
+                        .attr("stroke-width", 1.5)
+                        .attr("d", d3.line()
+                            .x(function(d) { return xScale(d.date) })
+                            .y(function(d) { return yScale(d.curr_value) })
+                            )
+                });
+            }
         
             
 		</script>
+        <button type="button" onclick="drawLinePlot()">Click Me!</button>
+        <form action="" onclick="drawLinePlot()">
+            <p>Covid Trends by:</p>
+            <input type="radio" id="confirmed" name="val" value="Confirmed" checked>
+            <label for="confirmed">Confirmed</label><br>
+            <input type="radio" id="deceased" name="val" value="Deceased">
+            <label for="deceased">Deceased</label><br>
+
+            <br>
+            <p>Sex:</p>
+            <input type="radio" id="all" name="sex" value="all" checked>
+            <label for="all">All</label><br>
+            <input type="radio" id="male" name="sex" value="Male">
+            <label for="male">Male</label><br>
+            <input type="radio" id="female" name="sex" value="Female">
+            <label for="female">Female</label><br>
+
+            <br>
+            <p>Age Group:</p>
+            <input type="checkbox" id="selectAll" name="selectAll" value="selectAll" checked>
+            <label for="selectAll">All</label><br>
+            <input type="checkbox" id="0s" name="checkbox0" value="0s" checked>
+            <label for="0s">0s</label><br>
+            <input type="checkbox" id="10s" name="checkbox1" value="10s" checked>
+            <label for="10s">10s</label><br>
+            <input type="checkbox" id="20s" name="checkbox2" value="20s" checked>
+            <label for="20s">20s</label><br>
+            <input type="checkbox" id="30s" name="checkbox3" value="30s" checked>
+            <label for="30s">30s</label><br>
+            <input type="checkbox" id="40s" name="checkbox4" value="40s" checked>
+            <label for="40s">40s</label><br>
+            <input type="checkbox" id="50s" name="checkbox5" value="50s" checked>
+            <label for="50s">50s</label><br>
+            <input type="checkbox" id="60s" name="checkbox6" value="60s" checked>
+            <label for="60s">60s</label><br>
+            <input type="checkbox" id="70s" name="checkbox7" value="70s" checked>
+            <label for="70s">70s</label><br>
+            <input type="checkbox" id="80s" name="checkbox8" value="80s" checked>
+            <label for="80s">80s</label><br>
+        </form>
+    
+    <script>
+        // jQuery for checking all boxes (ages)
+        $('#selectAll').click(function(event) {   
+                if(this.checked) {
+                    // Iterate each checkbox
+                    $(':checkbox').each(function() {
+                        this.checked = true;                      
+                    });
+                } else {
+                    $(':checkbox').each(function() {
+                        this.checked = false;                       
+                    });
+                }
+            });
+    </script>
+
 	</body>
 </html>
