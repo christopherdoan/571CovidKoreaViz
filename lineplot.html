@@ -103,9 +103,13 @@
                                             
                                             // calcuate subtotal based on age groups
                                             var subtotal = 0;
-                                            for (var i = 0; i < 9; i++){
-                                                if (ageArr[i]){
-                                                    subtotal = subtotal + ageArrValues[i];
+                                            if (ageArr.every( e  => e == true)){
+                                                return d.curr_value;
+                                            } else {
+                                                for (var i = 0; i < 9; i++){
+                                                    if (ageArr[i]){
+                                                        subtotal = subtotal + ageArrValues[i];
+                                                    }
                                                 }
                                             }
                                             // apply ratio to subtotal
