@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<title>Lollipop</title>
+		<script type="text/javascript" src="https://d3js.org/d3.v6.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
+        <script src="https://unpkg.com/d3-simple-slider"></script>
+
+		
+	</head>
+    
+	<body>
+        
+    <svg width = 1000 height = 600 id =pop></svg>
+    <!-- <svg width = 1000 height = 80 id = slide></svg> -->
+        
+		<script type="text/javascript">
+
+			//Width and height
+            var margin = {top: 10, right: 30, bottom: 40, left: 90};
+			var width = 1000- margin.left - margin.right;
+			var height = 600- margin.top - margin.bottom;
+            var padding = 40;
+            
+
+            //Create SVG element
+            var svg = d3.select("svg#pop");
+						// .append("svg")
+						// .attr("width", width)
+						// .attr("height", height);
+
+            // var svg2 = d3.select("svg#slide");
+			// 			// .append("svg")
+			// 			// .attr("width", width)
+			// 			// .attr("height", 80);
+    
+            
+            var months = ["November", "December", "January", "February", "March", "April", "May", "June", "July"]
+
+            var dataTime = d3.range(0, 9).map(function(d) {
+                return new Date(2019,10 + d,3);
+            });
+
+            function drawPop(month){    
+                d3.csv(month).then((words)=>{
+
+                    var x = d3.scaleLinear()
+                        .domain([0,
+                                Math.max.apply(Math, words.map(function(o) { return o.counts; }))])
+                        .range([ margin.left, width]);
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(x))
+                        .selectAll("text")
+                        .attr("transform", "translate(-10,0)rotate(-45)")
+                        .style("text-anchor", "end");
+
+                    // Y axis
+                    var y = d3.scaleBand()
+                        .domain(words.map(function(d) { console.log(d.word); return d.word; }))
+                        .range([ 0, height ])
+                        .padding(1);
+
+                    svg.append("g")
+                    .attr("transform", "translate(" + margin.left + ",0)")
+                    .call(d3.axisLeft(y));
+
+                    // Lines
+                    svg.selectAll("myline")
+                    .data(words)
+                    .enter()
+                    .append("line")
+                        .attr("x1",x(0))
+                        .attr("x2", x(0))
+                        .attr("y1", function(d) { return y(d.word); })
+                        .attr("y2", function(d) { return y(d.word); })
+                        .transition()
+                        .duration(1000)
+                        .attr("x1", function(d) { return x(d.counts); })
+                        .attr("x2", x(0))
+                        .attr("y1", function(d) { return y(d.word); })
+                        .attr("y2", function(d) { return y(d.word); })
+                        .attr("stroke", "grey")
+
+                    // Circles
+                    svg.selectAll("mycircle")
+                    .data(words)
+                    .enter()
+                    .append("circle")
+                        .attr("cx", x(0))
+                        .attr("cy", function(d) { return y(d.word); })
+                        .transition()
+                        .duration(1000)
+                        .attr("cx", function(d) { return x(d.counts); })
+                        .attr("cy", function(d) { return y(d.word); })
+                        .attr("r", "4")
+                        .style("fill", "#69b3a2")
+                        .attr("stroke", "black");
+                });}
+            // drawPop('data/wordcounts_total.csv')
+            // svg.selectAll('g').remove();
+            drawPop('data/wordcounts_February.csv')
+            svg.selectAll('g').remove();
+
+		</script>
+       
+	</body>
+     
+</html>
