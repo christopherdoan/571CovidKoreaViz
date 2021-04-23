@@ -5,7 +5,7 @@ class Map extends Component {
     super(props);
   }
   render() {
-    return <div className="map">
+    return <div className="preview-map">
               <button onClick={()=>this.props.setMode("map")}>Map</button>
             </div>
   }

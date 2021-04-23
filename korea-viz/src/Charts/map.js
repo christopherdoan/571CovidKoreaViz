@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { legendColor } from 'd3-svg-legend';
 
-let init = (data) => {
+let initMap = (data) => {
   let visible = false;
   let width = 500;
   let height = 800;
@@ -30,13 +30,14 @@ let init = (data) => {
   let windowLayer = g.append('g')
     .classed('window-layer', true);
 
-
-
+  //color scale
   let color = d3.scaleLinear()
     .domain([1, 25])
     .clamp(true)
     .range(['#FDA50F50', '#EF7215CC', '#883000']);
 
+
+  //Tooltip class definition
   let Tooltip = d3.select(".vis-overlay")
     .append("div")
     .style("opacity", 0)
@@ -47,6 +48,8 @@ let init = (data) => {
     .style("border-radius", "5px")
     .style("padding", "5px");
 
+
+    //helper method for getting full province name
     let provinceNameMapping = (provinceName) => {
       if(provinceName === "Sejongsi"){
         return "Sejong";
@@ -54,25 +57,26 @@ let init = (data) => {
       return provinceName;
     }
 
-
+    //heat fill normalized between 0, 1
     let scaledHeatFill = (d) => {
       let rawConfirmCount;
-      rawConfirmCount = parseInt(data.map.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+      rawConfirmCount = parseInt(data.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
       return rawConfirmCount;
     }
 
     // Get province color
     let heat_fill = (d) => {
       let rawConfirmCount;
-      rawConfirmCount = parseInt(data.map.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+      rawConfirmCount = parseInt(data.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
 
-      let scaledConfirmCount = 25 * rawConfirmCount/data.map.maxConfirmCount;
+      let scaledConfirmCount = 25 * rawConfirmCount/data.maxConfirmCount;
 
       var name = d.properties.name_eng;
       var length = name.length;
       return color(scaledConfirmCount);
     }
 
+    //event listeners
     let mouseover = (d) => {
       // Highlight hovered province
       // d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
@@ -99,8 +103,10 @@ let init = (data) => {
       //   style("left", (d.pageX-parseFloat(this.Tooltip.style("width").split(".")[0])/2)+"px");
     }
 
-  let features = data.map.geoJson.default.features;
+  let features = data.geoJson.default.features;
 
+
+  //bind event listeners
   mapLayer.selectAll('path')
       .data(features)
       .enter().append('path')
@@ -143,6 +149,8 @@ let init = (data) => {
     svg.append("g")
             .attr("transform", "translate(10, 10)")
             .call(colorLegend);
+
+  //PUT ALL CODE THAT SHOULD BE RUN ON DRAW, UNDRAW IN HERE
   let toggle = () => {
     if(visible){
           mapLayer.selectAll('path').on('mouseover', null)
@@ -158,4 +166,4 @@ let init = (data) => {
   return toggle;
 }
 
-export default init;
+export default initMap;

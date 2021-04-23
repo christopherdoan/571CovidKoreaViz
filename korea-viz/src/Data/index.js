@@ -10,6 +10,9 @@ const data = {
     },
     geoJson: geoJson,
     maxConfirmCount: -1
+  },
+  timeseries: {
+    
   }
 };
 

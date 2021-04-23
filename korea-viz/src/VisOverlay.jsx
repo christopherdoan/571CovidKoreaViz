@@ -4,7 +4,8 @@ import autoBind from 'react-autobind';
 
 import { legendColor } from 'd3-svg-legend';
 
-import init from './Charts/map.js';
+import initMap from './Charts/map.js';
+import initTimeSeries from './Charts/timeseries.js';
 
 import './VisOverlay.css';
 
@@ -17,7 +18,9 @@ class VisOverlay extends Component {
     this.state = {mode: props.mode};
   }
   componentDidMount(){
-    setTimeout( () => {this.toggleMap = init(data)}, 50);
+    // this.toggleMap = init(data);
+    setTimeout( () => {this.toggleMap = initMap(data.map)}, 50);
+    setTimeout( () => {this.toggleTimeSeries = initTimeSeries(data.timeseries)}, 50);
   }
   static getDerivedStateFromProps(next_props, prev_state){
     if(next_props.mode !== prev_state.mode){
@@ -26,9 +29,13 @@ class VisOverlay extends Component {
     return null;
   }
   handleClick(event){
-    console.log(event.target === this.overlay);
-    if(event.target === this.overlay){
+    if(event.target === this.overlay){ //capture click on background of vis-overlay
       // d3.select('.vis-overlay > *').remove();
+      if(this.state.mode === "map"){
+        this.toggleMap();
+      }else if(this.state.mode === "timeseries"){
+
+      }
       this.props.setMode(undefined);
     }
     // if(event.target)
@@ -37,14 +44,31 @@ class VisOverlay extends Component {
     // if(this.state.mode){
     //   this.draw(this.state.mode);
     // }
+    console.log(this.state.mode);
     return <div className="vis-overlay" onClick={this.handleClick} ref={overlay => this.overlay = overlay} style={{
       pointerEvents: this.state.mode ? "all" : "none",
       backdropFilter: this.state.mode ? "blur(2px)" : "blur(0px)",
       opacity: this.state.mode ? 1 : 0,
     }}>
-          <svg id="map"></svg>
-          <svg id="time"></svg>
-          <svg id="word"></svg>
+        <div className="map-viz" style={{
+            opacity: this.state.mode === "map" ? 1 : 0,
+            pointerEvents: this.state.mode === "map" ? "all" : "none"
+              }}>
+            <svg id="map"></svg>
+            <div className="map-nav">
+              <button>On</button>
+              <button>Off</button>
+            </div>
+        </div>
+
+          <svg id="time" style={{
+            opacity: this.state.mode === "timeseries" ? 1 : 0,
+            pointerEvents: this.state.mode === "timeseries" ? "all" : "none"
+          }}></svg>
+          <svg id="word" style={{
+            opacity: this.state.mode === "word" ? 1 : 0,
+            pointerEvents: this.state.mode === "word" ? "all" : "none"
+          }}></svg>
         </div>
   }
 }

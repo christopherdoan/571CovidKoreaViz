@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Layout } from 'antd';
 
-import Map from './Views/Map.jsx';
+import Map from './Views/PreviewMap.jsx';
+import TimeSeries from './Views/PreviewTimeSeries.jsx';
 import VisOverlay from './VisOverlay.jsx';
 import ScrollingText from './ScrollingText.jsx';
 
@@ -35,7 +36,7 @@ class Root extends Component {
                 </Sider>
                 <Content>
                   <div className="time-series">
-                    Time Series
+                    <TimeSeries setMode={this.setMode}/>
                   </div>
                   <div className="word-cloud">
                     Word Cloud
