@@ -18,11 +18,10 @@
   stroke: black;
 }
 
-#tooltip {
+.tooltip {
   background: rgba(255, 255, 255, 0.92);
-  position:absolute;
-  height:auto;
-  visibility:hidden;
+  position: absolute;
+  height: auto;
   z-index:9999;
   padding:5px;
   border: 1px solid #ddd;
@@ -33,6 +32,10 @@
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
 }
 
+path {
+  /* transition: opacity 0.4s ease-in-out; */
+}
+
 </style>
 
 <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -40,7 +43,7 @@
 
 <body>
 
-<svg></svg>
+<div id="template"><svg></svg></div>
 <script src="https://d3js.org/d3.v6.min.js" charset="utf-8"></script>
 <script src="https://d3js.org/topojson.v3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" integrity="sha512-wNH6xsp2n8CfB91nrBtfc4sfLwYPBMjSWVUwQOp60AYYXH6i8yCwuKFZ4rgK2i6pQek/b+bSyR7b01/922IBzQ==" crossorigin="anonymous"></script>
@@ -94,6 +97,15 @@ var color = d3.scaleLinear()
 
 let confirmCountByProvince = {};
 let maxConfirmCount = 1
+var Tooltip = d3.select("#template")
+  .append("div")
+  .style("opacity", 0)
+  .attr("class", "tooltip")
+  .style("background-color", "white")
+  .style("border", "solid")
+  .style("border-width", "2px")
+  .style("border-radius", "5px")
+  .style("padding", "5px");
 
  d3.csv("/data/time_province.csv").then(function(data) {
    for (var i = 0; i < data.length; i++) {
@@ -114,7 +126,12 @@ let maxConfirmCount = 1
          .attr('vector-effect', 'non-scaling-stroke')
          .attr("fill", heat_fill)
          .on('mouseover', mouseover)
-         .on('mouseout', mouseout);
+         .on('mouseout', mouseout)
+         .on('mousemove', mousemove);
+
+
+
+
 
      // Attach name to province
      mapLayer.selectAll("text")
@@ -152,15 +169,29 @@ function info(d){
 
 function mouseover(d){
   // Highlight hovered province
-  d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
+  // d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
   d3.select(this).style('opacity', 0.5);
   d3.select(this).style("stroke-width", 3);
+  Tooltip
+    .style("opacity", 1);
 }
 
 function mouseout(d){
   // Reset province color
   d3.select(this).style('opacity', 1);
   d3.select(this).style("stroke-width", 1);
+  Tooltip
+    .style("opacity", 0);
+}
+
+function mousemove(d, e){
+  Tooltip
+    .html(`<b>${e.properties.name_eng}:</b><br>Confirmed cases: ${scaledHeatFill(e)}`)
+    .style("left", (d.pageX+5) + "px")
+    .style("top", (d.pageY+5) + "px")
+
+  // Tooltip.
+  //   style("left", (d.pageX-parseFloat(Tooltip.style("width").split(".")[0])/2)+"px");
 }
 
 function origin_proj(d){
@@ -173,7 +204,7 @@ function origin_proj(d){
 }
 
 function dest_proj(d){
-  console.log(d);
+  // console.log(d);
   var projection = d3.geo.mercator()
   .scale(9900)
   .center([127.3845, 36.3504])
@@ -182,6 +213,11 @@ function dest_proj(d){
   return p2;
 }
 
+function scaledHeatFill(d){
+  let rawConfirmCount;
+  rawConfirmCount = parseInt(confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+  return rawConfirmCount;
+}
 
 // Get province color
 function heat_fill(d){
@@ -189,6 +225,7 @@ function heat_fill(d){
   rawConfirmCount = parseInt(confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
 
   let scaledConfirmCount = 25 * rawConfirmCount/maxConfirmCount;
+
   var name = d.properties.name_eng;
   var length = name.length;
   return color(scaledConfirmCount);
