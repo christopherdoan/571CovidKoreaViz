@@ -19,9 +19,7 @@ const data = {
     },
     deceasedData:{
 
-    },
-    maxDate: new Date(2020, 1, 20),
-    minDate: new Date(2020, 0, 20)
+    }
   }
 };
 
@@ -52,8 +50,6 @@ var rowConverter = function(d) {
 let count = 0;
 d3.csv(tsDataConfirmed, rowConverter, function(d) {
   data.timeseries.confirmedData[count] = rowConverter(d);
-  data.timeseries.maxDate = new Date(Math.max(data.timeseries.confirmedData[count].date, data.timeseries.maxDate));
-  data.timeseries.minDate = new Date(Math.min(data.timeseries.confirmedData[count].date, data.timeseries.minDate));
   count += 1;
 });
 count = 0;
@@ -62,6 +58,5 @@ d3.csv(tsDataDeceased, rowConverter, function(d) {
   count += 1;
 });
 
-console.log(data);
 
 export default data;
