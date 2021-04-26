@@ -78,7 +78,7 @@
     <div id= "template"><svg width = 1000 height = 600 id = cloud></svg></div>
     <svg width = 1000 height = 80 id = slide></svg>
     <div class="radio-toolbar">
-        <input type="radio" name="states" value="set1" id = "1" check = "checked">
+        <input type="radio" name="states" value="set1" id = "1" checked = "checked">
         <label for = "1">
             Word Cloud
         </label>
@@ -170,148 +170,149 @@
             // var ticker = function(d){return d + 'GB';};
 
             // console.log(dataTime[1])
+            myDataPromises.then((allData) =>{
 
-            var slider2 = d3
-                .sliderHorizontal()
-                .min(0)
-                .max(1)
-                .step(1000 * 60 * 60 * 24 * 31)
-                .width(width-(padding*2))
-                .tickFormat(d3.timeFormat('%m-%Y'))
-                .tickValues(dataTime)
-                .default(new Date(2019,10,3))
+                var slider2 = d3
+                    .sliderHorizontal()
+                    .min(0)
+                    .max(1)
+                    .step(1000 * 60 * 60 * 24 * 31)
+                    .width(width-(padding*2))
+                    .tickFormat(d3.timeFormat('%m-%Y'))
+                    .tickValues(dataTime)
+                    .default(new Date(2019,10,3))
 
-            var slider = d3
-                .sliderHorizontal()
-                .min(d3.min(dataTime))
-                .max(d3.max(dataTime))
-                .step(1000 * 60 * 60 * 24 * 31)
-                .width(width-(padding*2))
-                .tickFormat(d3.timeFormat('%m-%Y'))
-                .tickValues(dataTime)
-                .default(new Date(2019,10,3))
-                .on('onchange', (val) => {
-                    flag = 0;
-                    svg.select('g').interrupt();
-                    svg.select('g').remove();
-                    svg.append('g');
-                    var index = 0;
-                    for(const month of monthList){
-                        if (val.getTime() === month.getTime()){
-                            drawCloud(months[index]);
-                        }
-                        index = index + 1;
-                    }
-                    });
-            
-
-            var totalButton = d3.selectAll("button");
-            totalButton.on("click", function(d){
-                flag = 1;
-                svg.select('g').interrupt();
-                svg.select('g').remove();
-                svg.append('g');
-                drawCloud("total");
-
-            });
-            const buttons = d3.selectAll('input');
-            var type = "set1";
-            buttons.on('change', function(d) {
-                type = this.value;
-                svg.selectAll("line").remove();
-                svg.selectAll("circle").remove();
-                svg.select('g').remove();
-                svg.append('g');
-
-                if (flag === 1){
-                    drawCloud("total")
-                }
-                else{
-                    var val = slider.value()
-                    var index = 0;
-                    for(const month of monthList){
+                var slider = d3
+                    .sliderHorizontal()
+                    .min(d3.min(dataTime))
+                    .max(d3.max(dataTime))
+                    .step(1000 * 60 * 60 * 24 * 31)
+                    .width(width-(padding*2))
+                    .tickFormat(d3.timeFormat('%m-%Y'))
+                    .tickValues(dataTime)
+                    .default(new Date(2019,10,3))
+                    .on('onchange', (val) => {
+                        flag = 0;
+                        svg.select('g').interrupt();
+                        svg.select('g').remove();
+                        svg.append('g');
+                        var index = 0;
+                        for(const month of monthList){
                             if (val.getTime() === month.getTime()){
                                 drawCloud(months[index]);
                             }
                             index = index + 1;
                         }
-                }
-            });
-
-            var cloudSlider = svg2.append('g')
-                .attr('transform', 'translate(30,30)');
-            
-            cloudSlider.call(slider)
-
-            drawCloud("total");
-
-            var indWords = svg.selectAll("g");
-            indWords.on("click", function(d){
-                console.log("here");
-            });
-
-            var indLines = svg.selectAll('g');
-            console.log(indLines)
-            indLines.on("click", function(d){
-                console.log("here");
-            });
-
-            // Initialize slider
-            // var slider = d3.slider().min(0).max(10).ticks(10).showRange(true).value(0);
-            // Render the slider in the div
-            function drawCloud(month){  
+                        });
                 
-                var fill = d3.scaleOrdinal(d3.schemeCategory10);
 
-                myDataPromises.then((allData) =>{
-                    var typeTitle = "";
-                    var filterTitle = month;
-                    var counts; 
-                    if (month === "total"){
-                        counts = allData[0];
+                var totalButton = d3.selectAll("button");
+                totalButton.on("click", function(d){
+                    flag = 1;
+                    svg.select('g').interrupt();
+                    svg.select('g').remove();
+                    svg.append('g');
+                    drawCloud("total");
+
+                });
+                const buttons = d3.selectAll('input');
+                var type = "set1";
+                buttons.on('change', function(d) {
+                    type = this.value;
+                    svg.selectAll("line").remove();
+                    svg.selectAll("circle").remove();
+                    svg.select('g').remove();
+                    svg.append('g');
+
+                    if (flag === 1){
+                        drawCloud("total")
                     }
                     else{
-                        counts = allData[monthsObj[month]];
-                    }
-                    if (type === "set1"){
-                        typeTitle = "Word Cloud";
-                        var width = 1000;
-			            var height = 600;
-                        svg.select('g').interrupt();
-                    // d3.select('svg#cloud').select('g').selectAll('text').transition().style("font-size", "1px");
-                        svg.select('g').remove();
-                        svg.append('g');
-                        var countMax = Math.sqrt(Math.max.apply(Math, counts.map(function(o) { return o.counts; })));
-                        var countMin = Math.sqrt(Math.min.apply(Math, counts.map(function(o) { return o.counts; })));
-                        var wordScale = d3.scaleLinear()
-                            .domain([countMin, countMax])
-                            .range([15,115]);
-                        var layout = d3.layout.cloud()
-                            .size([width, height])
-                            .words(counts)
-                            .text((d) => d.word)
-                            .fontSize(function(d){
-                                // console.log(wordScale(Math.sqrt(d.counts)));
-                                return wordScale(Math.sqrt(d.counts));
-                            })
-                            .on("end", draw);
-                        
-
-                        layout.start();
-
-
-                        function getCount(word,struct){
-                            var i;
-                            var returnCount = 0;
-                            for (i = 0; i < struct.length; i++){
-                                if (word === struct[i].word){
-                                    returnCount = struct[i].counts
+                        var val = slider.value()
+                        var index = 0;
+                        for(const month of monthList){
+                                if (val.getTime() === month.getTime()){
+                                    drawCloud(months[index]);
                                 }
+                                index = index + 1;
                             }
-                            return returnCount;
+                    }
+                });
+
+                var cloudSlider = svg2.append('g')
+                    .attr('transform', 'translate(30,30)');
+                
+                cloudSlider.call(slider)
+
+                drawCloud("total");
+
+                var indWords = svg.selectAll("g");
+                indWords.on("click", function(d){
+                    console.log("here");
+                });
+
+                var indLines = svg.selectAll('g');
+                console.log(indLines)
+                indLines.on("click", function(d){
+                    console.log("here");
+                });
+
+                // Initialize slider
+                // var slider = d3.slider().min(0).max(10).ticks(10).showRange(true).value(0);
+                // Render the slider in the div
+                function drawCloud(month){  
+                    
+                    var fill = d3.scaleOrdinal(d3.schemeCategory10);
+
+                    
+                        var typeTitle = "";
+                        var filterTitle = month;
+                        var counts; 
+                        if (month === "total"){
+                            counts = allData[0];
                         }
-                        function draw(words) {
-                            // console.log(words);
+                        else{
+                            counts = allData[monthsObj[month]];
+                        }
+                        if (type === "set1"){
+                            typeTitle = "Word Cloud";
+                            var width = 1000;
+                            var height = 600;
+                            svg.select('g').interrupt();
+                        // d3.select('svg#cloud').select('g').selectAll('text').transition().style("font-size", "1px");
+                            svg.select('g').remove();
+                            svg.append('g');
+                            var countMax = Math.sqrt(Math.max.apply(Math, counts.map(function(o) { return o.counts; })));
+                            var countMin = Math.sqrt(Math.min.apply(Math, counts.map(function(o) { return o.counts; })));
+                            var wordScale = d3.scaleLinear()
+                                .domain([countMin, countMax])
+                                .range([15,115]);
+                            var layout = d3.layout.cloud()
+                                .size([width, height])
+                                .words(counts)
+                                .text((d) => d.word)
+                                .fontSize(function(d){
+                                    // console.log(wordScale(Math.sqrt(d.counts)));
+                                    return wordScale(Math.sqrt(d.counts));
+                                })
+                                .on("end", draw);
+                            
+
+                            layout.start();
+
+
+                            function getCount(word,struct){
+                                var i;
+                                var returnCount = 0;
+                                for (i = 0; i < struct.length; i++){
+                                    if (word === struct[i].word){
+                                        returnCount = struct[i].counts
+                                    }
+                                }
+                                return returnCount;
+                            }
+                            function draw(words) {
+                                // console.log(words);
                             svg.select("g")
                                 .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2  + ")")
                                 .selectAll("text")
@@ -348,7 +349,7 @@
                         typeTitle = "Lollipop Chart";
                         var margin = {top: 10, right: 30, bottom: 40, left: 90};
                         var width = 1000- margin.left - margin.right;
-			            var height = 600- margin.top - margin.bottom;
+                        var height = 600- margin.top - margin.bottom;
                         svg.selectAll('g').remove();
                         svg.selectAll("line").remove();
                         svg.selectAll("circle").remove();
@@ -385,6 +386,7 @@
                             .attr("x2", x(0))
                             .attr("y1", function(d) { return y(d.word); })
                             .attr("y2", function(d) { return y(d.word); })
+                            .attr("stroke-width", 1)
                             .transition()
                             .duration(1000)
                             .attr("x1", function(d) { return x(d.counts); })
@@ -420,35 +422,35 @@
                     }
 
                     svg3.select("text").transition().text("Search Keyword Trends " + typeTitle + " (" +month+")");
-                
-                });
-            }
+                    
+                }
 
-        
-            function mouseover(d){
-            // Highlight hovered province
-            // d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
-            Tooltip
-                .style("opacity", 1);
-            }
+            
+                function mouseover(d){
+                // Highlight hovered province
+                // d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
+                Tooltip
+                    .style("opacity", 1);
+                }
 
-            function mouseout(d){
-            // Reset province color
-            Tooltip
-                .style("opacity", 0);
-            }
+                function mouseout(d){
+                // Reset province color
+                Tooltip
+                    .style("opacity", 0);
+                }
 
-            function mousemove(d, e){
-            console.log(d);
-            console.log(e);
-            Tooltip
-                .html(`Volume (converted): ${e.counts}`)
-                .style("left", (d.pageX+5) + "px")
-                .style("top", (d.pageY+5) + "px")
+                function mousemove(d, e){
+                console.log(d);
+                console.log(e);
+                Tooltip
+                    .html(`Volume (converted): ${e.counts}`)
+                    .style("left", (d.pageX+5) + "px")
+                    .style("top", (d.pageY+5) + "px")
 
-            // Tooltip.
-            //   style("left", (d.pageX-parseFloat(Tooltip.style("width").split(".")[0])/2)+"px");
-            }
+                // Tooltip.
+                //   style("left", (d.pageX-parseFloat(Tooltip.style("width").split(".")[0])/2)+"px");
+                }
+            });
 
         
             
