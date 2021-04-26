@@ -74,6 +74,7 @@
 	</head>
     
 	<body>
+     <!-- Add items to body -->
     <svg width = 1000 height = 50 id = title></svg>
     <div id= "template"><svg width = 1000 height = 600 id = cloud></svg></div>
     <svg width = 1000 height = 80 id = slide></svg>
@@ -91,7 +92,6 @@
      
 
     <svg width = 80 height = 80 id = slide2></svg>
-    <!-- <button type="button">Click Me!</button> -->
 		<script type="text/javascript">
             
 
@@ -99,32 +99,30 @@
 			var width = 1000;
 			var height = 600;
             var padding = 40;
-
+            // Flag to show the word cloud totals or filter per month
             var flag = 1;
 
-            //Create SVG element
-            var svg = d3.select("svg#cloud");
-						// .append("svg")
-						// .attr("width", width)
-						// .attr("height", height);
+            //Create SVG elements
+            var svg = d3.select("svg#cloud");  
             svg.append('g')
-
+            
+            //svg for slider
             var svg2 = d3.select("svg#slide");
-
+            
+            //svg for title
             var svg3 = d3.select("svg#title");
 
-						// .append("svg")
-						// .attr("width", width)
-						// .attr("height", 80);
-            
+            // Code to initially create title
             svg3.append('text')
-                .text("Search Keyword Trends Cloud (Total)")
+                .text("Search Keyword Trends Word Cloud (total)")
                 .attr("x", (width / 2))             
                 .attr("y", 35 )
                 .attr("text-anchor", "middle")  
                 .style("font-size", "36px") 
                 .style("text-decoration", "underline");
 
+            
+            // Code for tooltips: taken from AJ's code
             var Tooltip = d3.select("#template")
                 .append("div")
                 .style("opacity", 0)
@@ -135,15 +133,17 @@
                 .style("border-radius", "5px")
                 .style("padding", "5px");
     
-            
+            // Data structs to fill in logic for slider 
             var months = ["November", "December", "January", "February", "March", "April", "May", "June", "July"]
             var monthsObj = {"November" : 1, "December": 2, "January": 3, "February": 4, "March": 5, 
                             "April": 6, "May": 7, "June": 8, "July": 9}
 
+            // Function that creates dates based on index 0 to 9
             var dataTime = d3.range(0, 9).map(function(d) {
                 return new Date(2019,10 + d,3);
             });
 
+            // More variables and datastructures for slider logic
             var november = new Date(2019,10,3);
             var december = new Date(2019,11,3,23);
             var january = new Date(2020,0,3,23);
@@ -155,6 +155,7 @@
             var july = new Date(2020,6,8);
             var monthList = [november, december, january, february, march, april, may, june, july];
 
+            // promises that hold file names for each data file
             var promises = [d3.csv("data/wordcounts_total.csv"),
                 d3.csv("data/wordcounts_November.csv"),
                 d3.csv("data/wordcounts_December.csv"),
@@ -167,21 +168,9 @@
                 d3.csv("data/wordcounts_July.csv"),];
             var myDataPromises = Promise.all(promises);
 
-            // var ticker = function(d){return d + 'GB';};
-
-            // console.log(dataTime[1])
+            // Load all data
             myDataPromises.then((allData) =>{
-
-                var slider2 = d3
-                    .sliderHorizontal()
-                    .min(0)
-                    .max(1)
-                    .step(1000 * 60 * 60 * 24 * 31)
-                    .width(width-(padding*2))
-                    .tickFormat(d3.timeFormat('%m-%Y'))
-                    .tickValues(dataTime)
-                    .default(new Date(2019,10,3))
-
+                // Code to add slider for months filter
                 var slider = d3
                     .sliderHorizontal()
                     .min(d3.min(dataTime))
@@ -205,8 +194,10 @@
                         }
                         });
                 
-
+                // Code to toggle viewing by filter or viewing total numbers
                 var totalButton = d3.selectAll("button");
+
+                // Logic for changing
                 totalButton.on("click", function(d){
                     flag = 1;
                     svg.select('g').interrupt();
@@ -215,7 +206,11 @@
                     drawCloud("total");
 
                 });
+
+                // Code for radio buttons to switch between cloud and lollipop view
                 const buttons = d3.selectAll('input');
+
+                // type will be used as a global variable to be checked to draw a word cloud or lollipop
                 var type = "set1";
                 buttons.on('change', function(d) {
                     type = this.value;
@@ -223,7 +218,8 @@
                     svg.selectAll("circle").remove();
                     svg.select('g').remove();
                     svg.append('g');
-
+                    
+                    // draw total if the flag is 1, draw filtered on month if flag is 0
                     if (flag === 1){
                         drawCloud("total")
                     }
@@ -239,80 +235,84 @@
                     }
                 });
 
+                // Just adds slider to svg2
                 var cloudSlider = svg2.append('g')
                     .attr('transform', 'translate(30,30)');
                 
                 cloudSlider.call(slider)
 
+                // Inital graph is total word cloud
                 drawCloud("total");
 
-                var indWords = svg.selectAll("g");
-                indWords.on("click", function(d){
-                    console.log("here");
-                });
-
-                var indLines = svg.selectAll('g');
-                console.log(indLines)
-                indLines.on("click", function(d){
-                    console.log("here");
-                });
-
-                // Initialize slider
-                // var slider = d3.slider().min(0).max(10).ticks(10).showRange(true).value(0);
-                // Render the slider in the div
+                // Draw cloud actually draws both word cloud and lollipop
                 function drawCloud(month){  
-                    
+                    // Colors for the word cloud
                     var fill = d3.scaleOrdinal(d3.schemeCategory10);
-
                     
-                        var typeTitle = "";
-                        var filterTitle = month;
-                        var counts; 
-                        if (month === "total"){
-                            counts = allData[0];
-                        }
-                        else{
-                            counts = allData[monthsObj[month]];
-                        }
-                        if (type === "set1"){
-                            typeTitle = "Word Cloud";
-                            var width = 1000;
-                            var height = 600;
-                            svg.select('g').interrupt();
-                        // d3.select('svg#cloud').select('g').selectAll('text').transition().style("font-size", "1px");
-                            svg.select('g').remove();
-                            svg.append('g');
-                            var countMax = Math.sqrt(Math.max.apply(Math, counts.map(function(o) { return o.counts; })));
-                            var countMin = Math.sqrt(Math.min.apply(Math, counts.map(function(o) { return o.counts; })));
-                            var wordScale = d3.scaleLinear()
-                                .domain([countMin, countMax])
-                                .range([15,115]);
-                            var layout = d3.layout.cloud()
-                                .size([width, height])
-                                .words(counts)
-                                .text((d) => d.word)
-                                .fontSize(function(d){
-                                    // console.log(wordScale(Math.sqrt(d.counts)));
-                                    return wordScale(Math.sqrt(d.counts));
-                                })
-                                .on("end", draw);
-                            
+                    //Fills in the title using conditionals, counts is the data structure
+                    var typeTitle = "";
+                    var filterTitle = month;
+                    var counts;
+                    
+                    // Set the datastructure based on month or total
+                    if (month === "total"){
+                        counts = allData[0];
+                    }
+                    else{
+                        counts = allData[monthsObj[month]];
+                    }
 
-                            layout.start();
+                    //If the radio is on word cloud, we draw the word cloud here
+                    if (type === "set1"){
 
+                        // Set the title 
+                        typeTitle = "Word Cloud";
 
-                            function getCount(word,struct){
-                                var i;
-                                var returnCount = 0;
-                                for (i = 0; i < struct.length; i++){
-                                    if (word === struct[i].word){
-                                        returnCount = struct[i].counts
-                                    }
+                        // Height and width declaration
+                        var width = 1000;
+                        var height = 600;
+
+                        //Remove whatever chart is there. Add a new group
+                        svg.select('g').interrupt();
+                        svg.select('g').remove();
+                        svg.append('g');
+
+                        // Code to get the min and max counts
+                        var countMax = Math.sqrt(Math.max.apply(Math, counts.map(function(o) { return o.counts; })));
+                        var countMin = Math.sqrt(Math.min.apply(Math, counts.map(function(o) { return o.counts; })));
+
+                        // Scales
+                        var wordScale = d3.scaleLinear()
+                            .domain([countMin, countMax])
+                            .range([15,115]);
+
+                        // Word cloud specific layout code
+                        var layout = d3.layout.cloud()
+                            .size([width, height])
+                            .words(counts)
+                            .text((d) => d.word)
+                            .fontSize(function(d){
+                                return wordScale(Math.sqrt(d.counts));
+                            })
+                            .on("end", draw);
+                        
+
+                        layout.start();
+
+                        // This function gets the word's count
+                        function getCount(word,struct){
+                            var i;
+                            var returnCount = 0;
+                            for (i = 0; i < struct.length; i++){
+                                if (word === struct[i].word){
+                                    returnCount = struct[i].counts
                                 }
-                                return returnCount;
                             }
-                            function draw(words) {
-                                // console.log(words);
+                            return returnCount;
+                        }
+
+                        // Function to draw the actual word cloud
+                        function draw(words) {
                             svg.select("g")
                                 .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2  + ")")
                                 .selectAll("text")
@@ -331,10 +331,6 @@
                                 .on('click', function(d){
                                     getCount(d3.select(this).data()[0].word,counts);
                                 })
-                                // .on('mouseover', function(d){
-                                //     var tempData = d3.select(this);
-                                //     console.log("this")
-                                // })
                                 .transition()
                                 .text((d) => d.text)
                                 .style("font-size", (d) => d.size + "px")
@@ -343,20 +339,30 @@
                                 .attr("text-anchor", "middle")
                                 .attr("transform", (d) => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")");
                         }
+                        // Set the title here
                         svg3.select("text").transition().text("Search Keyword Trends " + typeTitle);
                     }
+                    // when the radio button is on lollipop chart
                     else if (type === "set2"){
                         typeTitle = "Lollipop Chart";
+
+                        // Set indepdent margin, width and height
                         var margin = {top: 10, right: 30, bottom: 40, left: 90};
                         var width = 1000- margin.left - margin.right;
                         var height = 600- margin.top - margin.bottom;
+
+                        //Remove anything that is currently on the chart
                         svg.selectAll('g').remove();
                         svg.selectAll("line").remove();
                         svg.selectAll("circle").remove();
+
+                        // scale that goes from 0 to the max count of the dataset we are on
                         var x = d3.scaleLinear()
                         .domain([0,
                                 Math.max.apply(Math, counts.map(function(o) { return o.counts; }))])
                         .range([ margin.left, width]);
+
+                        // add the bottom axis
                         svg.append("g")
                             .attr("transform", "translate(0," + height + ")")
                             .call(d3.axisBottom(x))
@@ -365,19 +371,18 @@
                             .attr("transform", "translate(-10,0)rotate(-45)")
                             .style("text-anchor", "end");
 
-                        // Y axis
+                        // add y axis
                         var y = d3.scaleBand()
                             .domain(counts.map(function(d) { console.log(d.word); return d.word; }))
                             .range([ 0, height ])
-                            .padding(1)
-                            ;
+                            .padding(1);
 
                         svg.append("g")
                         .attr("transform", "translate(" + margin.left + ",0)")
                         .call(d3.axisLeft(y))
                         .style("font-size", '14px');
 
-                        // Lines
+                        // Draw lines
                         svg.selectAll("myline")
                         .data(counts)
                         .enter()
@@ -395,7 +400,7 @@
                             .attr("y2", function(d) { return y(d.word); })
                             .attr("stroke", "grey")
 
-                        // Circles
+                        // Draw circles
                         svg.selectAll("mycircle")
                         .data(counts)
                         .enter()
@@ -420,35 +425,29 @@
                             .attr("stroke", "black");
                             
                     }
-
+                    // Set title here
                     svg3.select("text").transition().text("Search Keyword Trends " + typeTitle + " (" +month+")");
                     
                 }
 
-            
+                // Shows tooltip
                 function mouseover(d){
-                // Highlight hovered province
-                // d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
                 Tooltip
                     .style("opacity", 1);
                 }
-
+                // Hides tooltip
                 function mouseout(d){
-                // Reset province color
                 Tooltip
                     .style("opacity", 0);
                 }
-
+                // Creates tooltip
                 function mousemove(d, e){
                 console.log(d);
                 console.log(e);
                 Tooltip
                     .html(`Volume (converted): ${e.counts}`)
                     .style("left", (d.pageX+5) + "px")
-                    .style("top", (d.pageY+5) + "px")
-
-                // Tooltip.
-                //   style("left", (d.pageX-parseFloat(Tooltip.style("width").split(".")[0])/2)+"px");
+                    .style("top", (d.pageY+5) + "px");
                 }
             });
 
