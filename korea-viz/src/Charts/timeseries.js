@@ -5,6 +5,7 @@ let initTimeSeries = (data) => {
   let width = 1000;
 	let height = 600;
   let padding = 40;
+  let bins = [true, true, true, true, true, true, true, true, true];
 
   let svg = d3.select('#time').attr('width', width).attr('height', height);
   svg.append('rect')
@@ -59,7 +60,7 @@ let initTimeSeries = (data) => {
 
     var line = svg.selectAll(".line")
       .data([data], function(d){ return d.ser1 });
-    
+
     line.enter()
       .append("path")
       .attr("class", "line")
@@ -84,11 +85,15 @@ let initTimeSeries = (data) => {
   // draw whole graph
   update(Object.values(data.deceasedData));
 
-
-  let toggle = () => {
-
+  let updateBins = (newBins) => {
+    bins = newBins;
+    console.log(bins);
   }
-  return toggle;
+
+  // let toggle = () => {
+  //
+  // }
+  return updateBins;
 }
 
 export default initTimeSeries;

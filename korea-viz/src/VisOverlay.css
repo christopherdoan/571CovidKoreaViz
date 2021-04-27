@@ -44,6 +44,29 @@
   border-radius: 10px;
 }
 
-#map {
+.map-viz {
   transform: translateX(calc(50vw - 250px));
+}
+
+.map-viz > svg > *, .map-viz > *, .time-viz > svg > *, .time-viz > * {
+  pointer-events: none;
+}
+
+.map-viz.active > svg > *, .map-viz.active > *, .time-viz.active > svg > *, .time-viz.active > * {
+  pointer-events: all;
+}
+
+.time-viz, .map-viz {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.time-viz.active, .map-viz.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.time-viz {
+  position: absolute;
+  transform: translateX(calc(50vw - 500px));
 }
