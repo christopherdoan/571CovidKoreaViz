@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Layout } from 'antd';
 
-import Map from './Views/PreviewMap.jsx';
-import TimeSeries from './Views/PreviewTimeSeries.jsx';
+import PreviewMap from './Views/PreviewMap.jsx';
+import PreviewTimeSeries from './Views/PreviewTimeSeries.jsx';
+import PreviewWordCloud from './Views/PreviewWordCloud.jsx';
 import VisOverlay from './VisOverlay.jsx';
 import ScrollingText from './ScrollingText.jsx';
 
@@ -32,14 +33,14 @@ class Root extends Component {
               </Header>
               <Layout className="visualizations">
                 <Sider>
-                  <Map setMode={this.setMode}/>
+                  <PreviewMap setMode={this.setMode}/>
                 </Sider>
                 <Content>
                   <div className="time-series">
-                    <TimeSeries setMode={this.setMode}/>
+                    <PreviewTimeSeries setMode={this.setMode}/>
                   </div>
                   <div className="word-cloud">
-                    Word Cloud
+                    <PreviewWordCloud setMode={this.setMode} />
                   </div>
                 </Content>
               </Layout>

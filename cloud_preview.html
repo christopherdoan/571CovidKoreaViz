@@ -5,14 +5,14 @@
 		<title>Cloud Preview</title>
 		<script type="text/javascript" src="https://d3js.org/d3.v6.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
-		
+
 	</head>
 	<body>
 		<script type="text/javascript">
 
 			//Width and height
 			var width = 1000;
-			var height = 600;
+			var height = "50vh - 87.5px";
             var padding = 40;
 
             //Create SVG element
@@ -25,17 +25,17 @@
             //Scales
             var xScale = d3.scaleTime().range([padding, width - padding * 2]);
             var yScale = d3.scaleLinear().range ([height - padding, padding]);
-            
-            // var promises = [d3.csv("/data/ConfirmedData.csv", rowConverter), 
+
+            // var promises = [d3.csv("/data/ConfirmedData.csv", rowConverter),
             //     d3.csv("/data/DeceasedData.csv", rowConverter)];
             // var myDataPromises = Promise.all(promises);
-            
+
             // myDataPromises.then(function(data){
 
-               
+
             // });
 
-            var fill = d3.scaleOrdinal(d3.schemeCategory10);    
+            var fill = d3.scaleOrdinal(d3.schemeCategory10);
 
             d3.csv("data/wordcounts_total.csv")
             .then((counts) =>{
@@ -45,7 +45,7 @@
                     .text((d) => d.word)
                     .fontSize((d) => Math.sqrt(d.counts))
                     .on("end", draw);
-                
+
 
                 // svg.append("words")
                 //     .data(words)
@@ -70,11 +70,11 @@
                         .attr("transform", (d) => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")");
                 }
 
-            
+
             });
 
-        
-            
+
+
 		</script>
 	</body>
 </html>

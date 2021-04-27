@@ -4,7 +4,17 @@ import tpData from './time_province.csv';
 import tsDataConfirmed from './ConfirmedData.csv';
 import tsDataDeceased from './DeceasedData.csv';
 import * as geoJson from './skorea-provinces-2018-geo.json';
-import link from './link.csv'
+import link from './link.csv';
+import wcTotal from './wordcounts_total.csv';
+import wcNovember from './wordcounts_November.csv';
+import wcDecember from './wordcounts_December.csv';
+import wcJanuary from './wordcounts_January.csv';
+import wcFebruary from './wordcounts_February.csv';
+import wcMarch from './wordcounts_March.csv';
+import wcApril from './wordcounts_April.csv';
+import wcMay from './wordcounts_May.csv';
+import wcJune from './wordcounts_June.csv';
+import wcJuly from './wordcounts_July.csv';
 
 const data = {
   map: {
@@ -22,6 +32,9 @@ const data = {
     deceasedData:{
 
     }
+  },
+  wordcloud: {
+
   }
 };
 
@@ -64,6 +77,57 @@ count = 0;
 d3.csv(tsDataDeceased, rowConverter, function(d) {
   data.timeseries.deceasedData[count] = rowConverter(d);
   count += 1;
+});
+
+//wordcloud code
+data.wordcloud.total = [];
+d3.csv(wcTotal, function(d){
+  data.wordcloud.total.push(d);
+});
+
+data.wordcloud.november = [];
+d3.csv(wcNovember, function(d){
+  data.wordcloud.november.push(d);
+});
+
+data.wordcloud.december = [];
+d3.csv(wcDecember, function(d){
+  data.wordcloud.december.push(d);
+});
+
+data.wordcloud.january = [];
+d3.csv(wcJanuary, function(d){
+  data.wordcloud.january.push(d);
+});
+
+data.wordcloud.february = [];
+d3.csv(wcFebruary, function(d){
+  data.wordcloud.february.push(d);
+});
+
+data.wordcloud.march = [];
+d3.csv(wcMarch, function(d){
+  data.wordcloud.march.push(d);
+});
+
+data.wordcloud.april = [];
+d3.csv(wcApril, function(d){
+  data.wordcloud.april.push(d);
+});
+
+data.wordcloud.may = [];
+d3.csv(wcMay, function(d){
+  data.wordcloud.may.push(d);
+});
+
+data.wordcloud.june = [];
+d3.csv(wcJune, function(d){
+  data.wordcloud.june.push(d);
+});
+
+data.wordcloud.july = [];
+d3.csv(wcJuly, function(d){
+  data.wordcloud.july.push(d);
 });
 
 

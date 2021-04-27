@@ -16,11 +16,11 @@ let initMap = (data) => {
 
   let svg = d3.select('#map').attr('width', width).attr('height', height);
 
-
-  svg.append('rect')
-    .attr('class', 'background')
-    .attr('width', width)
-    .attr('height', height);
+  //
+  // svg.append('rect')
+  //   .attr('class', 'background')
+  //   .attr('width', width)
+  //   .attr('height', height);
 
 
   let g = svg.append('g');
@@ -58,10 +58,10 @@ let initMap = (data) => {
       }
       return provinceName;
     }
- 
 
 
-    
+
+
     //heat fill normalized between 0, 1
     let scaledHeatFill = (d) => {
       let rawConfirmCount;
@@ -84,18 +84,18 @@ let initMap = (data) => {
     let names = [0,1,2,3,4,5,6,7,8,9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43]
     let linkScale = d3.scaleOrdinal()
           .domain(names)
-          .range(["#1b70fc", "#faff16", "#d50527", "#158940", "#f898fd", 
-          "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa", 
-          "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", 
-          "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", 
-          "#8a91a7", "#88fc07", "#ea42fe", "#9e8010", "#10b437", "#c281fe", 
-          "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", 
-          "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", 
+          .range(["#1b70fc", "#faff16", "#d50527", "#158940", "#f898fd",
+          "#24c9d7", "#cb9b64", "#866888", "#22e67a", "#e509ae", "#9dabfa",
+          "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d",
+          "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae",
+          "#8a91a7", "#88fc07", "#ea42fe", "#9e8010", "#10b437", "#c281fe",
+          "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8",
+          "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9",
           "#989e5d", "#fe9169"]);
 
 
     let draw_link = (d) =>{
-      
+
         mapLayer.selectAll("lines")
           .data(data.link)
           .enter()
@@ -133,7 +133,7 @@ let initMap = (data) => {
               .style("stroke", "red")
               .attr("stroke-width", function(d){
                 return Math.log(Math.round(d.count)*35);
-              });    
+              });
           })
           .on("mouseout", function(d,i){
             d3.select(this)
@@ -146,9 +146,9 @@ let initMap = (data) => {
                 return Math.log(Math.round(d.count)*6);
               });
             windowLayer.selectAll('text').remove("text");
-            windowLayer.selectAll("rect").remove("rect");   
+            windowLayer.selectAll("rect").remove("rect");
           })
-        
+
           .on("click",function(d){
 
             var tempData = d3.select(this).data()[0];
@@ -165,7 +165,7 @@ let initMap = (data) => {
               .attr('width', 250)
               .attr('height', 150)
               .attr("fill-opacity", "80%");
-              
+
 
             windowLayer.append("text")
               .text("Origin: " + tempData.origin_name)
@@ -203,14 +203,14 @@ let initMap = (data) => {
 
           });
     };
-      
+
      //event listeners
      let mouseover_line = (d, e) => {
        console.log("kkkk")
       d3.select(d.target).style("stroke", "red")
       .attr("stroke-width", function(e){
         return Math.log(Math.round(e.count)*35);
-      });  
+      });
       Tooltip
         .style("opacity", 1);
     }
@@ -232,11 +232,11 @@ let initMap = (data) => {
     }
 
 
-  
-   
+
+
     //event listeners
     let mouseover_path = (d) => {
-      console.log('kkaa')
+      console.log('kkaa');
       // Highlight hovered province
       // d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
       d3.select(d.target).style('opacity', 0.5);
@@ -262,7 +262,7 @@ let initMap = (data) => {
   let features = data.geoJson.default.features;
 
 
-  
+
 
   //bind event listeners
   mapLayer.selectAll('path')
@@ -274,7 +274,7 @@ let initMap = (data) => {
       .on('mouseover', mouseover_path)
       .on('mouseout', mouseout_path)
       .on('mousemove', mousemove_path);
-  
+
   mapLayer.selectAll('lines')
       .data(data.link)
       .enter().append('line')
@@ -283,7 +283,7 @@ let initMap = (data) => {
       .on('mouseover', mouseover_line)
       .on('mouseout', mouseout_line)
       .on('mousemove', mousemove_line);
-  
+
 
 
   // Attach name to province
@@ -319,6 +319,7 @@ let initMap = (data) => {
             .attr("transform", "translate(10, 10)")
             .call(colorLegend);
   draw_link()
+  d3.select('#map').attr('height', "max(80vh, 700px)");
 
   //PUT ALL CODE THAT SHOULD BE RUN ON DRAW, UNDRAW IN HERE
   let toggle = () => {
@@ -331,9 +332,9 @@ let initMap = (data) => {
                   .on('mousemove', null);
       }else{
         mapLayer.selectAll('path')
-                  .on('mouseover_path', mouseover_path)
-                  .on('mouseout_path', mouseout_path)
-                  .on('mousemove_path', mousemove_path);
+                  .on('mouseover', mouseover_path)
+                  .on('mouseout', mouseout_path)
+                  .on('mousemove', mousemove_path);
         mapLayer.selectAll('lines')
                   .on('mouseover', mouseover_line)
                   .on('mouseout', mouseout_line)

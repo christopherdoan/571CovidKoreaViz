@@ -50,12 +50,12 @@ path {
 <script>
 
 /* JavaScript goes here. */
-var width = 960,
-    height = 1150;
+var width = 700,
+    height = 900;
 
 var projection = d3.geoMercator()
-  .scale(9900)
-  .center([127.3845, 36.3504])
+  .scale(7000)
+  .center([127.3845, 36])
   .translate([width / 2, height / 2]);
 
 var path = d3.geoPath()
@@ -65,10 +65,7 @@ var svg = d3.select('svg')
   .attr('width', width)
   .attr('height', height);
 
-svg.append('rect')
-  .attr('class', 'background')
-  .attr('width', width)
-  .attr('height', height);
+
 
 
 var g = svg.append('g');

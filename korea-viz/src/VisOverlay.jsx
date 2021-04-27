@@ -6,6 +6,7 @@ import { legendColor } from 'd3-svg-legend';
 
 import initMap from './Charts/map.js';
 import initTimeSeries from './Charts/timeseries.js';
+import initWordCloud from './Charts/wordcloud.js';
 
 import './VisOverlay.css';
 
@@ -15,16 +16,17 @@ class VisOverlay extends Component {
   constructor(props) {
     super(props);
     autoBind(this);
-    this.state = {mode: props.mode, checked: [true, true, true, true, true, true, true, true, true, true]}; //order of checked: All, 0s, 10s... 80s
+    this.state = {loading: true, mode: props.mode, checked: [true, true, true, true, true, true, true, true, true, true]}; //order of checked: All, 0s, 10s... 80s
   }
   componentDidMount(){
     // this.toggleMap = init(data);
-    setTimeout( () => {this.toggleMap = initMap(data.map)}, 50);
     setTimeout( () => {
-      let timeHandlers = initTimeSeries(data.timeseries);
-      // this.toggleTimeSeries = timeHandlers[0];
-      this.updateBins = timeHandlers;
-    }, 50);
+        this.toggleMap = initMap(data.map);
+        let timeHandlers = initTimeSeries(data.timeseries);
+        this.updateBins = timeHandlers;
+        this.toggleWordCloud = initWordCloud(data.wordcloud);
+        this.setState({loading: false});
+    }, 500);
   }
   static getDerivedStateFromProps(next_props, prev_state){
     if(next_props.mode !== prev_state.mode){
@@ -44,7 +46,7 @@ class VisOverlay extends Component {
     }
     // if(event.target)
   }
-  
+
   onChange1(e) {
     console.log(e.target.value);
     console.log(e.target.valueAsNumber);
@@ -68,20 +70,16 @@ class VisOverlay extends Component {
     //   this.draw(this.state.mode);
     // }
     console.log(this.state.mode);
-    return <div className="vis-overlay" onClick={this.handleClick} ref={overlay => this.overlay = overlay} style={{
-      pointerEvents: this.state.mode ? "all" : "none",
-      backdropFilter: this.state.mode ? "blur(2px)" : "blur(0px)",
-      opacity: this.state.mode ? 1 : 0,
-    }}>
-        <div className="map-viz" style={{
-            opacity: this.state.mode === "map" ? 1 : 0,
-            pointerEvents: this.state.mode === "map" ? "all" : "none"
-              }}>
-        
-            
+    return <div className={`vis-overlay ${this.state.mode || this.state.loading ? "active" : ""}`} onClick={this.handleClick} ref={overlay => this.overlay = overlay}>
+        <div className={`loading-overlay ${this.state.loading ? "active" : ""}`}>
+          Loading...
+        </div>
+        <div className={`map-viz ${this.state.mode === "map" ? 'active' : ''}`}>
+
+
             <svg id="map" className="map"></svg>
             </div>
-     
+
         <div className={`time-viz ${this.state.mode === "timeseries" ? 'active' : ''}`} >
           <svg id="time" ></svg>
 
@@ -142,16 +140,26 @@ class VisOverlay extends Component {
 
           </form>
         </div>
-          <svg id="word" style={{
-            opacity: this.state.mode === "word" ? 1 : 0,
-            pointerEvents: this.state.mode === "word" ? "all" : "none"
-          }}></svg>
+          <div className={`wordcloud-viz ${this.state.mode === "wordcloud" ? 'active' : ''}`}>
+            <svg width="1000" height="50" id="title"></svg>
+            <div id= "template"><svg width="1000" height="600" id="cloud"></svg></div>
+            <svg width="1000" height="80" id="slide"></svg>
+            <div class="radio-toolbar">
+                <input type="radio" className="radioBtn" name="states" value="set1" id = "1" checked = "checked"/>
+                <label for = "1">
+                    Word Cloud
+                </label>
+                <input type="radio" className="radioBtn" name="states" value="set2" id = "2"/>
+                <label for = "2">
+                    Lollipop Chart
+                </label>
+                <button className="total">Show total</button>
+            </div>
+          </div>
         </div>
-  
-  
+
+
 
         }
       }
 export default VisOverlay;
-        
-      

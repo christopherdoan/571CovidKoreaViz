@@ -6,7 +6,6 @@ import Root from './Root.jsx';
 function App() {
   return (
     <div className="App">
-
       <Root />
     </div>
   );
