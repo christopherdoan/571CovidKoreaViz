@@ -19,8 +19,8 @@ class VisOverlay extends Component {
   }
   componentDidMount(){
     // this.toggleMap = init(data);
-    setTimeout( () => {this.toggleMap = initMap(data.map)}, 50);
-    setTimeout( () => {this.toggleTimeSeries = initTimeSeries(data.timeseries)}, 50);
+    setTimeout( () => {this.toggleMap = initMap(data.map)}, 500);
+    setTimeout( () => {this.toggleTimeSeries = initTimeSeries(data.timeseries)}, 500);
   }
   static getDerivedStateFromProps(next_props, prev_state){
     if(next_props.mode !== prev_state.mode){
@@ -40,6 +40,14 @@ class VisOverlay extends Component {
     }
     // if(event.target)
   }
+  select(target){
+    if (target === "linkmap") {
+      this.toggleLinkMap()
+    }
+    else if (target ==="heatmap"){
+      this.toggleMap()
+    }
+  }
   render() {
     // if(this.state.mode){
     //   this.draw(this.state.mode);
@@ -54,11 +62,10 @@ class VisOverlay extends Component {
             opacity: this.state.mode === "map" ? 1 : 0,
             pointerEvents: this.state.mode === "map" ? "all" : "none"
               }}>
-            <svg id="map"></svg>
-            <div className="map-nav">
-              <button>On</button>
-              <button>Off</button>
-            </div>
+        
+            
+            <svg id="map" className="map"></svg>
+            
         </div>
 
           <svg id="time" style={{

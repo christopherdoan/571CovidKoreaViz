@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { legendColor } from 'd3-svg-legend';
 
-let initMap = (data) => {
+let initLinkMap = (data) => {
   let visible = false;
   let width = 500;
   let height = 800;
@@ -14,7 +14,7 @@ let initMap = (data) => {
   let path = d3.geoPath()
     .projection(projection);
 
-  let svg = d3.select('#map').attr('width', width).attr('height', height);
+  let svg = d3.select('#linkmap').attr('width', width).attr('height', height);
 
 
   svg.append('rect')
@@ -342,4 +342,4 @@ let initMap = (data) => {
   return toggle;
 }
 
-export default initMap;
+export default initLinkMap;
