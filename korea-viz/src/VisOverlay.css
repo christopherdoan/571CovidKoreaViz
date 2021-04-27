@@ -44,7 +44,7 @@
   border-radius: 10px;
 }
 
-#map {
+.map-viz {
   transform: translateX(calc(50vw - 250px));
 }
 /* .map-viz {
@@ -73,3 +73,4 @@
   position: absolute;
   transform: translateX(calc(50vw - 500px));
 } */
+

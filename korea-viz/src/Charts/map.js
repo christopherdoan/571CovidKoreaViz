@@ -61,6 +61,7 @@ let initMap = (data) => {
  
 
 
+    
     //heat fill normalized between 0, 1
     let scaledHeatFill = (d) => {
       let rawConfirmCount;
