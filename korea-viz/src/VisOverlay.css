@@ -89,7 +89,7 @@ body {
 
 .map-viz {
   /* -webkit-backdrop-filter: blur(3px); */
-  background: rgba(255, 255, 255, 0.8);
+  background: #91cfd2ad;
   padding: 10px;
   border-radius: 12px;
   /* backdrop-filter: blur(3px);
@@ -97,17 +97,26 @@ body {
 }
 
 .loading-overlay {
+  position: fixed;
+  top: 0px;
+  left: 0px;
   font-size: 96px;
-  letter-spacing: 0.05em;
-  display: none;
+  letter-spacing: 0.1em;
+  /* display: none; */
+  opacity: 0;
+  pointer-events: none;
   margin: auto;
   min-width: 100vw;
   color: white;
-  text-transform: uppercase;
+  font-weight: 200;
+  /* text-transform: uppercase; */
+  font-family: 'Playfair Display';
 }
 
 .loading-overlay.active {
-  display: block;
+  /* display: block; */
+  opacity: 1;
+  pointer-events: all;
 }
 
 * {
@@ -118,8 +127,8 @@ body {
   pointer-events: none;
   opacity: 0;
   /* transition: opacity 0.5s ease-in-out; */
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .vis-overlay.active {

@@ -36,7 +36,7 @@ let initMap = (data) => {
   let color = d3.scaleLinear()
     .domain([1, 25])
     .clamp(true)
-    .range(['#FDA50F50', '#EF7215CC', '#883000']);
+    .range(['#faf2ca', '#fc6f03', '#fc1c03']);
 
 
   //Tooltip class definition
