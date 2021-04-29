@@ -150,25 +150,6 @@ class VisOverlay extends Component {
                     );
               })
             }
-            {/*<input type="checkbox" id="0s" name="checkbox0" value="0s" checked />
-            <label for="0s">0s</label><br/>
-            <input type="checkbox" id="10s" name="checkbox1" value="10s" checked />
-            <label for="10s">10s</label><br/>
-            <input type="checkbox" id="20s" name="checkbox2" value="20s" checked />
-            <label for="20s">20s</label><br/>
-            <input type="checkbox" id="30s" name="checkbox3" value="30s" checked />
-            <label for="30s">30s</label><br/>
-            <input type="checkbox" id="40s" name="checkbox4" value="40s" checked />
-            <label for="40s">40s</label><br/>
-            <input type="checkbox" id="50s" name="checkbox5" value="50s" checked />
-            <label for="50s">50s</label><br/>
-            <input type="checkbox" id="60s" name="checkbox6" value="60s" checked />
-            <label for="60s">60s</label><br/>
-            <input type="checkbox" id="70s" name="checkbox7" value="70s" checked />
-            <label for="70s">70s</label><br/>
-            <input type="checkbox" id="80s" name="checkbox8" value="80s" checked />
-            <label for="80s">80s</label><br/>*/}
-
           </form>
         </div>
           <div className={`wordcloud-viz ${this.state.mode === "wordcloud" ? 'active' : ''}`}>

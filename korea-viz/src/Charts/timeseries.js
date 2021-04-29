@@ -1,13 +1,13 @@
 import * as d3 from 'd3';
 
 let initTimeSeries = (data) => {
-  let visible = false;
   let width = 1000;
 	let height = 600;
   let padding = 40;
+  let drawDuration = 1000;
   let bins = [
     [true, false], //confirmed or deceased
-    [true, false, false], //sex: all, male(used in html), female(used in html), male(Actual), female(actual)
+    [true, false, false], //sex: all, male, female
     [true, true, true, true, true, true, true, true, true, true]//order of checked: All, 0s, 10s... 80s
   ];
   let svg = d3.select('#time').attr('width', width).attr('height', height);
@@ -55,7 +55,7 @@ let initTimeSeries = (data) => {
     })
     ]);
     svg.selectAll(".axisX").transition()
-      .duration(300)
+      .duration(drawDuration)
       .call(xAxis);
 
     // create ratio variable for future calcuations in relation to age groups
@@ -100,7 +100,7 @@ let initTimeSeries = (data) => {
     })]);
     svg.selectAll(".axisY")
       .transition()
-      .duration(300)
+      .duration(drawDuration)
       .call(yAxis);
 
       var line = svg.selectAll(".line")
@@ -111,7 +111,7 @@ let initTimeSeries = (data) => {
       .attr("class", "line")
       .merge(line)
       .transition()
-      .duration(300)
+      .duration(drawDuration)
       .attr("d", d3.line()
         .x(function(d){
           return xScale(d.date);
