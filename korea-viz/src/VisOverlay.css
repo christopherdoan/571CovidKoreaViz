@@ -74,6 +74,16 @@ body {
 .time-viz {
   position: absolute;
   transform: translateX(calc(50vw - 500px));
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+#timeGraph{ 
+  float:left;
+}
+#tsForm{
+  float:right;
 }
 
 .wordcloud-viz {

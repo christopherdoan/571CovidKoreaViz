@@ -82,7 +82,6 @@ class VisOverlay extends Component {
     this.setState({checked: [tempArr, this.state.checked[1],this.state.checked[2]]});
   }
   onSexChange(e){
-    console.log(e.target.value);
     let tempArr = [false, false, false];
     if (e.target.value === "Male"){
       tempArr = [false, true, false];
@@ -109,39 +108,42 @@ class VisOverlay extends Component {
             </div>
 
         <div className={`time-viz ${this.state.mode === "timeseries" ? 'active' : ''}`} >
-          <svg id="time" ></svg>
-
-          <form action="" >
+          <svg id="timeGraph"></svg>
+          <div id="tsForm">
+          <form action="">
             <p>Covid Trends by:</p>
             <input type="radio" id="confirmed" name="val" value="Confirmed" checked={this.state.checked[0][0]} onChange={this.selectData} />
-            <label for="confirmed">Confirmed</label><br/>
+            <label for="confirmed">Confirmed</label>
             <input type="radio" id="deceased" name="val" value="Deceased" checked={this.state.checked[0][1]} onChange={this.selectData} />
-            <label for="deceased">Deceased</label><br/>
+            <label for="deceased">Deceased</label>
 
             <br/>
+            <br/>
+            
             <p>Sex:</p>
            
               <input type="radio" id="all" name="sex" value="all" checked={this.state.checked[1][0]} onChange={this.onSexChange}/>
-              <label for="all">All</label><br/>
+              <label for="all">All</label>
               <input type="radio" id="male" name="sex" value="Male" checked={this.state.checked[1][1]} onChange={this.onSexChange} />
-              <label for="male">Male</label><br/>
+              <label for="male">Male</label>
               <input type="radio" id="female" name="sex" value="Female" checked={this.state.checked[1][2]} onChange={this.onSexChange}/>
-              <label for="female">Female</label><br/>
+              <label for="female">Female</label>
             
 
             <br/>
+            <br/>
+            
             <p>Age Group:</p>
             <input type="checkbox" id="selectAll" name="selectAll" value="selectAll" checked={this.state.checked[2][0]} onChange={this.selectAllAge} />
             <label for="selectAll">All</label><br/>
             {
-              this.state.checked[2].map((e, i) => {
+              this.state.checked[2].slice(0, this.state.checked[2].length-1).map((e, i) => {
                 return (
                       <div className="age-checkbox">
                         <input type="checkbox" id={`${i}s`} name={`checkbox${i}`} value={`${i}s`} checked={this.state.checked[2][i+1]} onChange={()=>{
 
                           let tempChecked = this.state.checked[2];
                           tempChecked[i+1] = !tempChecked[i+1];
-                          console.log(e);
                           this.updateBins([this.state.checked[0], this.state.checked[1], tempChecked]);
                           this.setState({checked: [this.state.checked[0], this.state.checked[1],tempChecked]});
                         }} />
@@ -151,6 +153,7 @@ class VisOverlay extends Component {
               })
             }
           </form>
+          </div>
         </div>
           <div className={`wordcloud-viz ${this.state.mode === "wordcloud" ? 'active' : ''}`}>
             <svg width="1000" height="50" id="title"></svg>

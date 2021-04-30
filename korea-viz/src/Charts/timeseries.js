@@ -10,11 +10,11 @@ let initTimeSeries = (data) => {
     [true, false, false], //sex: all, male, female
     [true, true, true, true, true, true, true, true, true, true]//order of checked: All, 0s, 10s... 80s
   ];
-  let svg = d3.select('#time').attr('width', width).attr('height', height);
-  svg.append('rect')
-    .attr('class', 'background')
-    .attr('width', width)
-    .attr('height', height);
+  let svg = d3.select('#timeGraph').attr('width', width).attr('height', height);
+  // svg.append('rect')
+  //   .attr('class', 'background')
+  //   .attr('width', width)
+  //   .attr('height', height + 0);
 
   // initialize x axis
   let xScale = d3.scaleTime()
@@ -38,7 +38,6 @@ let initTimeSeries = (data) => {
 
   let updateBins = (newBins) => {
     bins = newBins;
-    console.log(bins[1]);
 
     // set dataset
     let curr_data = Object.values(data.confirmedData)
