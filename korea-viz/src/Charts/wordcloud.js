@@ -282,7 +282,7 @@ let initWordCloud = (data) => {
 
               // add y axis
               let y = d3.scaleBand()
-                  .domain(counts.map(function(d) { console.log(d.word); return d.word; }))
+                  .domain(counts.map(function(d) { /*console.log(d.word); */return d.word; }))
                   .range([ 0, height ])
                   .padding(1);
 
@@ -351,12 +351,17 @@ let initWordCloud = (data) => {
       }
       // Creates tooltip
       function mousemove(d, e){
-        console.log(d);
-        console.log(e);
+        // console.log(d);
+        // console.log(e);
+        // let rect = d.target.getBoundingClientRect();
+        let rect = Tooltip._groups[0][0].parentElement.getBoundingClientRect()
+        // console.log(`${d.pageX}, ${d.pageY}`);
+        // console.log(`${d.clientX - rect.left}, ${d.clientY - rect.top}`);
+        // debugger;
         Tooltip
             .html(`Volume (converted): ${e.counts}`)
-            .style("left", (d.pageX+5) + "px")
-            .style("top", (d.pageY+5) + "px");
+            .style("left", (d.clientX - rect.left + 25) + "px")
+            .style("top", (d.clientY - rect.top + 25) + "px");
       }
 }
 

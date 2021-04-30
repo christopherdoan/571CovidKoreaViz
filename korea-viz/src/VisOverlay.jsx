@@ -16,12 +16,12 @@ class VisOverlay extends Component {
   constructor(props) {
     super(props);
     autoBind(this);
-    this.state = {loading: true, mode: props.mode, 
+    this.state = {loading: true, mode: props.mode, mapMode: "heat",
       checked: [
         [true, false],
         [true, false, false],
         [true, true, true, true, true, true, true, true, true, true]//order of checked: All, 0s, 10s... 80s
-      ]}; 
+      ]};
   }
   componentDidMount(){
     // this.toggleMap = init(data);
@@ -51,7 +51,10 @@ class VisOverlay extends Component {
     }
     // if(event.target)
   }
-
+  toggleMapMode(mapMode){
+    console.log(mapMode);
+    this.setState({mapMode: mapMode});
+  }
   onChange1(e) {
     console.log(e.target.value);
     console.log(e.target.valueAsNumber);
@@ -106,11 +109,11 @@ class VisOverlay extends Component {
 
           <svg id="map" className="map"></svg>
           <div class="ratio-toolbar">
-                <input type="radio" className="mapBtn" name="states" value="heat" id = "1" onChange={this.toggleMap}/>
+                <input type="checkbox" className="mapBtn" name="states" value="heat" id = "1" checked={this.state.mapMode === "heat"} onChange={(e)=>{this.toggleMap(e, this.toggleMapMode)}}/>
                 <label for = "1">
                   Heat Map
                 </label>
-                <input type="radio" className="mapBtn" name="states" value="link" id = "2" onChange={this.toggleMap}/>
+                <input type="checkbox" className="mapBtn" name="states" value="link" id = "2" checked={this.state.mapMode === "link"} onChange={(e)=>{this.toggleMap(e, this.toggleMapMode)}}/>
                 <label for = "2">
                   Contact Tracing
                 </label>
@@ -129,20 +132,20 @@ class VisOverlay extends Component {
 
             <br/>
             <br/>
-            
+
             <p>Sex:</p>
-           
+
               <input type="radio" id="all" name="sex" value="all" checked={this.state.checked[1][0]} onChange={this.onSexChange}/>
               <label for="all">All</label>
               <input type="radio" id="male" name="sex" value="Male" checked={this.state.checked[1][1]} onChange={this.onSexChange} />
               <label for="male">Male</label>
               <input type="radio" id="female" name="sex" value="Female" checked={this.state.checked[1][2]} onChange={this.onSexChange}/>
               <label for="female">Female</label>
-            
+
 
             <br/>
             <br/>
-            
+
             <p>Age Group:</p>
             <input type="checkbox" id="selectAll" name="selectAll" value="selectAll" checked={this.state.checked[2][0]} onChange={this.selectAllAge} />
             <label for="selectAll">All</label><br/>

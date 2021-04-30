@@ -206,7 +206,7 @@ let initMap = (data) => {
 
      //event listeners
      let mouseover_line = (d, e) => {
-      
+
       d3.select(d.target).style("stroke", "red")
       .attr("stroke-width", function(e){
         return Math.log(Math.round(e.count)*35);
@@ -260,26 +260,26 @@ let initMap = (data) => {
 
   let features = data.geoJson.default.features;
 
-  
+
   const buttons = d3.selectAll('.mapBtn');
 
-  // type will be used as a global letiable to be checked to draw a word cloud or lollipop
+  // type will be used as a global variable to be checked to draw a word cloud or lollipop
   let type = "heat";
   drawMap()
-  
-  buttons.on('change', function(d) {
-      console.log("btn clicked")
-      type = this.value;
-      console.log(type)
-      // mapLayer.selectAll("line").remove();
-      // mapLayer.selectAll('path').remove()
-      // mapLayer.selectAll('text').remove()
-      // svg.select('g').remove();
-      // svg.append('g');
 
-      drawMap()
-
-  });
+  // buttons.on('change', function(d) {
+  //     console.log("btn clicked")
+  //     type = this.value;
+  //     console.log(type)
+  //     // mapLayer.selectAll("line").remove();
+  //     // mapLayer.selectAll('path').remove()
+  //     // mapLayer.selectAll('text').remove()
+  //     // svg.select('g').remove();
+  //     // svg.append('g');
+  //
+  //     drawMap()
+  //
+  // });
 
   function drawMap(){
 
@@ -301,11 +301,11 @@ let initMap = (data) => {
               .shapeWidth(10)
               .shapeHeight(20)
               .labelOffset(12);
-  
+
       svg.append("g")
               .attr("transform", "translate(10, 10)")
               .call(colorLegend);
-    
+
 
 
       mapLayer.selectAll('path')
@@ -339,8 +339,8 @@ let initMap = (data) => {
         .attr('font-size','14px')
         .attr('font-family', 'Open Sans');
     }
-        
-      
+
+
 
     else if (type === "link"){
       console.log("on link map")
@@ -352,7 +352,7 @@ let initMap = (data) => {
                   .on('mouseout', null)
                   .on('mousemove', null);
 
-      
+
 
       mapLayer.selectAll('path')
         .data(features)
@@ -387,7 +387,7 @@ let initMap = (data) => {
               .shapeWidth(10)
               .shapeHeight(20)
               .labelOffset(12);
-  
+
       svg.append("g")
               .attr("transform", "translate(10, 10)")
               .call(colorLegend);
@@ -397,16 +397,17 @@ let initMap = (data) => {
 
   }
 
-  
-  
 
 
 
-  
+
+
+
   d3.select('#map').attr('height', "max(80vh, 700px)");
 
   //PUT ALL CODE THAT SHOULD BE RUN ON DRAW, UNDRAW IN HERE
-  let toggle = () => {
+  let toggle = (e, toggleMapMode) => {
+
     if(visible){
           mapLayer.selectAll('path').on('mouseover', null)
                   .on('mouseout', null)
@@ -423,6 +424,12 @@ let initMap = (data) => {
                   .on('mouseover', mouseover_line)
                   .on('mouseout', mouseout_line)
                   .on('mousemove', mousemove_line);
+        if(e !== undefined){
+          console.log("toggling");
+          type = e.target.value;
+          toggleMapMode(type);
+          drawMap();
+        }
       }
   }
   return toggle;
