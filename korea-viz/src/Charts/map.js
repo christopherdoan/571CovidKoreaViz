@@ -5,6 +5,7 @@ let initMap = (data) => {
   let visible = false;
   let width = 500;
   let height = 800;
+  let flag = 1;
 
   let projection = d3.geoMercator()
     .scale(6000)
@@ -24,7 +25,7 @@ let initMap = (data) => {
 
 
   let g = svg.append('g');
-  let mode = "heatmap"
+
 
   let mapLayer = g.append('g')
     .classed('map-layer', true);
@@ -127,7 +128,6 @@ let initMap = (data) => {
             return Math.log(Math.round(d.count)*6);
           })
           .on("mouseover", function(d){
-            console.log("here")
             d3.select(this)
               .transition()
               .style("stroke", "red")
@@ -206,7 +206,7 @@ let initMap = (data) => {
 
      //event listeners
      let mouseover_line = (d, e) => {
-       console.log("kkkk")
+      
       d3.select(d.target).style("stroke", "red")
       .attr("stroke-width", function(e){
         return Math.log(Math.round(e.count)*35);
@@ -236,7 +236,6 @@ let initMap = (data) => {
 
     //event listeners
     let mouseover_path = (d) => {
-      console.log('kkaa');
       // Highlight hovered province
       // d3.select(this).style('transition', 'opacity 0.2s stroke-width 0s');
       d3.select(d.target).style('opacity', 0.5);
@@ -261,64 +260,149 @@ let initMap = (data) => {
 
   let features = data.geoJson.default.features;
 
+  
+  const buttons = d3.selectAll('.mapBtn');
+
+  // type will be used as a global letiable to be checked to draw a word cloud or lollipop
+  let type = "heat";
+  drawMap()
+  
+  buttons.on('change', function(d) {
+      console.log("btn clicked")
+      type = this.value;
+      console.log(type)
+      // mapLayer.selectAll("line").remove();
+      // mapLayer.selectAll('path').remove()
+      // mapLayer.selectAll('text').remove()
+      // svg.select('g').remove();
+      // svg.append('g');
+
+      drawMap()
+
+  });
+
+  function drawMap(){
+
+    if (type === "heat"){
+      console.log("on heat map")
+
+      // svg.select('g').interrupt();
+      // svg.select('g').remove();
+      // svg.append('g');
+      mapLayer.selectAll("line").remove();
+      // mapLayer.selectAll('path').remove();
+      // mapLayer.selectAll('text').remove();
+      svg.selectAll("line").remove();
+
+      let colorLegend = legendColor()
+              .labelFormat(d3.format(".0f"))
+              .scale(color)
+              .shapePadding(0)
+              .shapeWidth(10)
+              .shapeHeight(20)
+              .labelOffset(12);
+  
+      svg.append("g")
+              .attr("transform", "translate(10, 10)")
+              .call(colorLegend);
+    
+
+
+      mapLayer.selectAll('path')
+        .data(features)
+        .enter().append('path')
+        .attr('d', path)
+        .attr('vector-effect', 'non-scaling-stroke')
+        .attr("fill", heat_fill)
+        .on('mouseover', mouseover_path)
+        .on('mouseout', mouseout_path)
+        .on('mousemove', mousemove_path);
+
+      mapLayer.selectAll("text")
+        .data(features)
+        .enter()
+        .append("svg:text")
+        .text(function(d){
+            return d.properties.name_eng;
+        })
+        .style('fill', 'black')
+        .style('stroke', 'transparent')
+        .attr("x", function(d){
+            return path.centroid(d)[0];
+        })
+        .attr("y", function(d){
+            return  path.centroid(d)[1];
+        })
+        .attr("text-anchor", function(d){
+          return d.properties.name_eng === "Gyeonggi-do" ? "initial" : "middle"
+        })
+        .attr('font-size','14px')
+        .attr('font-family', 'Open Sans');
+    }
+        
+      
+
+    else if (type === "link"){
+      console.log("on link map")
+      // svg.select('g').remove();
+      // mapLayer.selectAll('path').remove();
+      mapLayer.selectAll('text').remove();
+
+      mapLayer.selectAll('path').on('mouseover', null)
+                  .on('mouseout', null)
+                  .on('mousemove', null);
+
+      
+
+      mapLayer.selectAll('path')
+        .data(features)
+        .enter().append('path')
+        .attr('d', path)
+        .attr('vector-effect', 'non-scaling-stroke')
+
+      mapLayer.selectAll("text")
+        .data(features)
+        .enter()
+        .append("svg:text")
+        .text(function(d){
+            return d.properties.name_eng;
+        })
+        .style('fill', 'black')
+        .style('stroke', 'transparent')
+        .attr("x", function(d){
+            return path.centroid(d)[0];
+        })
+        .attr("y", function(d){
+            return  path.centroid(d)[1];
+        })
+        .attr("text-anchor", function(d){
+          return d.properties.name_eng === "Gyeonggi-do" ? "initial" : "middle"
+        })
+        .attr('font-size','14px')
+        .attr('font-family', 'Open Sans');
+      let colorLegend = legendColor()
+              .labelFormat(d3.format(".0f"))
+              .scale(color)
+              .shapePadding(0)
+              .shapeWidth(10)
+              .shapeHeight(20)
+              .labelOffset(12);
+  
+      svg.append("g")
+              .attr("transform", "translate(10, 10)")
+              .call(colorLegend);
+
+      draw_link();
+    }
+
+  }
+
+  
+  
 
 
 
-  //bind event listeners
-  mapLayer.selectAll('path')
-      .data(features)
-      .enter().append('path')
-      .attr('d', path)
-      .attr('vector-effect', 'non-scaling-stroke')
-      .attr("fill", heat_fill)
-      .on('mouseover', mouseover_path)
-      .on('mouseout', mouseout_path)
-      .on('mousemove', mousemove_path);
-
-  mapLayer.selectAll('lines')
-      .data(data.link)
-      .enter().append('line')
-      // .attr('d', line)
-      .attr('vector-effect', 'non-scaling-stroke')
-      .on('mouseover', mouseover_line)
-      .on('mouseout', mouseout_line)
-      .on('mousemove', mousemove_line);
-
-
-
-  // Attach name to province
-  mapLayer.selectAll("text")
-      .data(features)
-      .enter()
-      .append("svg:text")
-      .text(function(d){
-          return d.properties.name_eng;
-      })
-      .style('fill', 'black')
-      .style('stroke', 'transparent')
-      .attr("x", function(d){
-          return path.centroid(d)[0];
-      })
-      .attr("y", function(d){
-          return  path.centroid(d)[1];
-      })
-      .attr("text-anchor", function(d){
-        return d.properties.name_eng === "Gyeonggi-do" ? "initial" : "middle"
-      })
-      .attr('font-size','14px')
-      .attr('font-family', 'Open Sans');
-    let colorLegend = legendColor()
-            .labelFormat(d3.format(".0f"))
-            .scale(color)
-            .shapePadding(0)
-            .shapeWidth(10)
-            .shapeHeight(20)
-            .labelOffset(12);
-
-    svg.append("g")
-            .attr("transform", "translate(10, 10)")
-            .call(colorLegend);
-  draw_link()
+  
   d3.select('#map').attr('height', "max(80vh, 700px)");
 
   //PUT ALL CODE THAT SHOULD BE RUN ON DRAW, UNDRAW IN HERE

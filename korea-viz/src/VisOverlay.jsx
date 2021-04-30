@@ -104,8 +104,18 @@ class VisOverlay extends Component {
         <div className={`map-viz ${this.state.mode === "map" ? 'active' : ''}`}>
 
 
-            <svg id="map" className="map"></svg>
+          <svg id="map" className="map"></svg>
+          <div class="ratio-toolbar">
+                <input type="radio" className="mapBtn" name="states" value="heat" id = "1" onChange={this.toggleMap}/>
+                <label for = "1">
+                  Heat Map
+                </label>
+                <input type="radio" className="mapBtn" name="states" value="link" id = "2" onChange={this.toggleMap}/>
+                <label for = "2">
+                  Contact Tracing
+                </label>
             </div>
+        </div>
 
         <div className={`time-viz ${this.state.mode === "timeseries" ? 'active' : ''}`} >
           <svg id="timeGraph"></svg>
@@ -160,7 +170,7 @@ class VisOverlay extends Component {
             <div id= "template"><svg width="1000" height="600" id="cloud"></svg></div>
             <svg width="1000" height="80" id="slide"></svg>
             <div class="radio-toolbar">
-                <input type="radio" className="radioBtn" name="states" value="set1" id = "1" checked = "checked"/>
+                <input type="radio" className="radioBtn" name="states" value="set1" id = "1" checked="checked"/>
                 <label for = "1">
                     Word Cloud
                 </label>
