@@ -158,10 +158,11 @@ let initMap = (data) => {
             windowLayer
               .append("rect")
               .attr("fill", "white")
+              .attr("position", "absolute")
               .attr('stroke', 'black')
               .attr('stroke-width', '2px')
               .attr('x',projection([tempData.origin_lon, tempData.origin_lat])[0]-150)
-              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-300)
+              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-150)
               .attr('width', 250)
               .attr('height', 150)
               .attr("fill-opacity", "80%");
@@ -172,7 +173,7 @@ let initMap = (data) => {
               .attr('fill', 'black')
               .style('stroke', 'transparent')
               .attr('x',projection([tempData.origin_lon, tempData.origin_lat])[0]-140)
-              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-250)
+              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-100)
               // .attr("text-anchor","middle")
               .attr('font-size','14px');
 
@@ -182,7 +183,7 @@ let initMap = (data) => {
               .attr('fill', 'black')
               .style('stroke', 'transparent')
               .attr('x',projection([tempData.origin_lon, tempData.origin_lat])[0]-140)
-              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-230)
+              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-80)
               // .attr("text-anchor","middle")
               .attr('font-size','14px');
             windowLayer.append("text")
@@ -190,14 +191,14 @@ let initMap = (data) => {
               .attr('fill', 'black')
               .style('stroke', 'transparent')
               .attr('x',projection([tempData.origin_lon, tempData.origin_lat])[0]-140)
-              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-210)
+              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-60)
               // .attr("text-anchor","middle")
               .attr('font-size','14px');
             windowLayer.append("text")
               .text("DETAILS")
               .attr('fill', 'black')
               .attr('x',projection([tempData.origin_lon, tempData.origin_lat])[0]-70)
-              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-270)
+              .attr('y', projection([tempData.origin_lon, tempData.origin_lat])[1]-120)
               // .attr("text-anchor","middle")
               .attr('font-size','14px');
 
