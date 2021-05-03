@@ -107,11 +107,11 @@ body {
 }
 
 .loading-overlay {
-  position: fixed;
+  /* position: fixed; */
   top: 0px;
   left: 0px;
-  font-size: 96px;
-  letter-spacing: 0.1em;
+  /* font-size: 96px; */
+  /* letter-spacing: 0.1em; */
   /* display: none; */
   opacity: 0;
   pointer-events: none;
@@ -121,6 +121,10 @@ body {
   font-weight: 200;
   /* text-transform: uppercase; */
   font-family: 'Playfair Display';
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 64px;
+  transform: translateY(-100px);
 }
 
 .loading-overlay.active {
