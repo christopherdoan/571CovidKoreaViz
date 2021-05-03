@@ -1,11 +1,11 @@
-body {
+/* body {
   margin: 0;
   padding: 0;
   color: white;
   font-size: 4em;
   font-weight: bold;
   line-height: 80px;
-}
+} */
 
 .marquee {
   position: relative;
@@ -20,17 +20,22 @@ body {
   position: absolute;
   white-space: nowrap;
   will-change: transform;
-  animation: marquee 30s linear infinite;
+  animation: marquee 36s linear infinite;
 }
 
 @keyframes marquee {
   from { transform: translateX(0); }
-  to { transform: translateX(-300%); }
+  to { transform: translateX(-100%); }
 }
 
 
 .content {
   color: whiteSmoke !important;
+  margin: 0;
+  padding: 0;
+  font-size: 4em;
+  font-weight: bold;
+  line-height: 80px;
 }
 
 .ant-layout-footer {
