@@ -108,6 +108,36 @@ class VisOverlay extends Component {
 
 
           <svg id="map" className="map"></svg>
+          <div class="radio-toolbar2">
+                <input type="radio" className="radioBtn2" name="states2" value="total" id = "1"/>
+                <label for = "1">
+                   Total
+                </label>
+                <input type="radio" className="radioBtn2" name="states2" value="january" id = "2"/>
+                <label for = "2">
+                    Jan
+                </label>
+                <input type="radio" className="radioBtn2" name="states2" value="february" id = "3" />
+                <label for = "3">
+                   Feb
+                </label>
+                <input type="radio" className="radioBtn2" name="states2" value="march" id = "4"/>
+                <label for = "4">
+                    Mar
+                </label>
+                <input type="radio" className="radioBtn2" name="states2" value="april" id = "5" />
+                <label for = "5">
+                   Apr
+                </label>
+                <input type="radio" className="radioBtn2" name="states2" value="may" id = "6"/>
+                <label for = "6">
+                    May
+                </label>
+                <input type="radio" className="radioBtn2" name="states2" value="june" id = "7"/>
+                <label for = "7">
+                    Jun
+                </label>
+            </div>
           <div class="ratio-toolbar">
                 <input type="checkbox" className="mapBtn" name="states" value="heat" id = "1" checked={this.state.mapMode === "heat"} onChange={(e)=>{this.toggleMap(e, this.toggleMapMode)}}/>
                 <label for = "1">

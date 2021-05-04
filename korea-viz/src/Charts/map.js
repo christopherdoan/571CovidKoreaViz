@@ -66,14 +66,17 @@ let initMap = (data) => {
     //heat fill normalized between 0, 1
     let scaledHeatFill = (d) => {
       let rawConfirmCount;
-      rawConfirmCount = parseInt(data.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+      // rawConfirmCount = parseInt(data.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+      rawConfirmCount = parseInt(filter(mnth,provinceNameMapping(d.properties.name_eng) ));
       return rawConfirmCount;
     }
 
     // Get province color
     let heat_fill = (d) => {
+      // console.log(filter('total'));
       let rawConfirmCount;
-      rawConfirmCount = parseInt(data.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+      // rawConfirmCount = parseInt(data.confirmCountByProvince[provinceNameMapping(d.properties.name_eng)].confirmed);
+      rawConfirmCount = parseInt(filter(mnth,provinceNameMapping(d.properties.name_eng) ));
 
       let scaledConfirmCount = 25 * rawConfirmCount/data.maxConfirmCount;
 
@@ -81,6 +84,24 @@ let initMap = (data) => {
       var length = name.length;
       return color(scaledConfirmCount);
     }
+
+    let filter = (check_month, check_province) => {
+      let retArr = []
+      data.confirmedCount.forEach(element => {
+        if (element.month === check_month){
+          retArr.push(element)
+        }
+      });
+      let num;
+      retArr.forEach(elem =>{
+        if (elem.province === check_province){
+          num = elem.confirmed;
+        }
+      });
+      return num
+    }
+
+    
 
     let names = [0,1,2,3,4,5,6,7,8,9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43]
     let linkScale = d3.scaleOrdinal()
@@ -266,6 +287,7 @@ let initMap = (data) => {
 
   // type will be used as a global variable to be checked to draw a word cloud or lollipop
   let type = "heat";
+  let mnth = 'total'
   drawMap()
 
   // buttons.on('change', function(d) {
@@ -400,7 +422,18 @@ let initMap = (data) => {
 
 
 
+  const buttons2 = d3.selectAll('.radioBtn2');
 
+  buttons2.on('change', function(d) {
+    if(type === "heat"){
+      mnth = this.value;
+      console.log("mnth");
+      mapLayer.selectAll('path').remove();
+      mapLayer.selectAll('text').remove();
+      drawMap();
+    }
+    
+  });
 
 
 
