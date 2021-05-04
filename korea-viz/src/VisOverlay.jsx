@@ -16,6 +16,7 @@ class VisOverlay extends Component {
   constructor(props) {
     super(props);
     autoBind(this);
+    this.loadingEllipses = 0;
     this.state = {loading: true, mode: props.mode, mapMode: "heat",
       checked: [
         [true, false],
@@ -23,13 +24,30 @@ class VisOverlay extends Component {
         [true, true, true, true, true, true, true, true, true, true]//order of checked: All, 0s, 10s... 80s
       ]};
   }
+  animateEllipses(){
+    if(!this.loadingTxt){
+      return;
+    }
+    this.loadingTxt.innerHTML = `Loading${'.'.repeat(this.loadingEllipses)}`;
+    if(this.loadingEllipses === 3){
+      this.loadingEllipses = 0;
+    }else{
+      this.loadingEllipses+=1;
+    }
+    if(this.state.loading){
+      setTimeout(this.animateEllipses, 200);
+    }
+  }
   componentDidMount(){
     // this.toggleMap = init(data);
+    // let interval = setInterval( this.animateEllipses, 150);
+    this.animateEllipses();
     setTimeout( () => {
         this.toggleMap = initMap(data.map);
         let timeHandlers = initTimeSeries(data.timeseries);
         this.updateBins = timeHandlers;
         this.toggleWordCloud = initWordCloud(data.wordcloud);
+        // clearInterval(interval);
         this.setState({loading: false});
     }, 500);
   }
@@ -101,8 +119,8 @@ class VisOverlay extends Component {
     //   this.draw(this.state.mode);
     // }
     return <div className={`vis-overlay ${this.state.mode || this.state.loading ? "active" : ""}`} onClick={this.handleClick} ref={overlay => this.overlay = overlay}>
-        <div className={`loading-overlay ${this.state.loading ? "active" : ""}`}>
-          Loading...
+        <div className={`loading-overlay ${this.state.loading ? "active" : ""}`} ref={loadingTxt => this.loadingTxt = loadingTxt}>
+          Loading
         </div>
         <div className={`map-viz ${this.state.mode === "map" ? 'active' : ''}`}>
 
