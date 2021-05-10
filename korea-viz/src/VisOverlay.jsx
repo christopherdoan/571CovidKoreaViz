@@ -126,7 +126,7 @@ class VisOverlay extends Component {
 
 
           <svg id="map" className="map"></svg>
-          <div class="radio-toolbar2">
+          {/*<div class="radio-toolbar2">
                 <input type="radio" className="radioBtn2" name="states2" value="total" id = "1"/>
                 <label for = "1">
                    Total
@@ -155,7 +155,7 @@ class VisOverlay extends Component {
                 <label for = "7">
                     Jun
                 </label>
-            </div>
+            </div>*/}
           <div class="ratio-toolbar">
                 <input type="checkbox" className="mapBtn" name="states" value="heat" id = "1" checked={this.state.mapMode === "heat"} onChange={(e)=>{this.toggleMap(e, this.toggleMapMode)}}/>
                 <label for = "1">
