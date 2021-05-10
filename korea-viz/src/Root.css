@@ -1,0 +1,96 @@
+* {
+  font-family: 'Lato', sans-serif;
+}
+
+.ant-layout-header {
+  /* background: radial-gradient(transparent -75%, #7ec380); */
+  /* background: conic-gradient(from 180deg at 39.4% 120%, #5dbfbf, #5dbfbf, #eee1ef, #eee1ef); */
+  background: conic-gradient(from 180deg at 39.4% 120%, #5dbfbf, #5dbfbf,  #c5a2b2,  #c5a2b2);
+  height: 100px;
+  /* border-bottom: 2px solid #464646; */
+  border-bottom: 2px solid rgba(0, 0, 0, 0.25);
+}
+
+.ant-layout > * {
+}
+
+header h1 {
+  font-family: 'Playfair Display';
+  height: 45px;
+  margin-top: 5px;
+  margin-bottom: -5px;
+  color: whiteSmoke;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 36px;
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+header h3 > * {
+    font-size: 15px;
+    font-family: 'Open Sans';
+    color: white;
+}
+
+.visualizations {
+  min-height: calc(100vh - 175px);
+}
+
+.visualizations aside {
+  flex: 0 0 40vw !important;
+  max-width: 40vw !important;
+  min-width: 40vw !important;
+  width: 40vw !important;
+  transition: 0s;
+  background: radial-gradient(transparent -5%, #5dbfbf);
+  border-right: 2px solid rgba(0, 0, 0, 0.25);
+}
+
+.visualizations main {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-series, .word-cloud {
+  flex: 1;
+  /* margin: 2px; */
+}
+
+.time-series {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.25);
+  /* background: #eee1ef; */
+  background: radial-gradient(transparent, #c5a2b2)
+}
+
+.word-cloud {
+  background: #DFF2D8;
+}
+
+.visualizations main, .time-series, .word-cloud {
+  /* background: #F4EDEA; */
+}
+
+footer {
+  /* background: #7ec380 !important; */
+  background: conic-gradient(from 360deg at 40% -20%, #8273ff9c, #8273ff9c, #5dbfbf, #5dbfbf) !important;
+  /* max-height: calc(87.5vh - 700px); */
+  max-height: 75px;
+  /* min-height: 200px; */
+  padding: 10px 15px !important;
+  border-top: 2px solid rgba(0, 0, 0, 0.25);
+}
+
+.scrolling-text {
+  overflow-y: scroll;
+  max-height: 55px;
+  /* border: 1px solid rgba(0, 0, 0, 0.7); */
+  padding: 4px;
+  font-family: 'Playfair Display';
+  color: whitesmoke;
+  letter-spacing: 0.025em;
+  font-size: 14px;
+}
+
+.preview-wordcloud {
+  background: radial-gradient(transparent, #8273ff9c);
+}
